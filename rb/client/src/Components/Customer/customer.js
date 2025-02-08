@@ -1,4 +1,6 @@
+
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   TextField,
@@ -30,6 +32,8 @@ function Customer() {
     address: "",
   });
   const [customers, setCustomers] = useState([]);
+
+  const navigate = useNavigate(); 
 
   const handleOpen = () => {
     setCustomer({ name: "", shop: "", phone: "", address: "" });
@@ -95,6 +99,11 @@ function Customer() {
       containerId: "custom-toast",
       autoClose: 2000,
     });
+  };
+
+
+  const handleView = (customer) => {
+    navigate(`/transaction/${customer.name}`, { state: { customer } });
   };
 
   return (
@@ -225,25 +234,24 @@ function Customer() {
                   <TableCell style={styles.cell}>{cust.shop}</TableCell>
                   <TableCell style={styles.cell}>{cust.phone}</TableCell>
                   <TableCell style={styles.cell}>{cust.address}</TableCell>
-                 
+
                   <TableCell style={styles.cell}>
                     <IconButton
                       onClick={() => handleEdit(index)}
-                      style={{
-                        color: "aliceblue",
-                      }}
+                      style={{ color: "aliceblue" }}
                     >
                       <Edit />
                     </IconButton>
                     <IconButton
                       onClick={() => handleDelete(index)}
-                      style={{
-                        color: "aliceblue",
-                      }}
+                      style={{ color: "aliceblue" }}
                     >
                       <Delete />
                     </IconButton>
-                    <IconButton style={{ color: "aliceblue" }}>
+                    <IconButton
+                      onClick={() => handleView(cust)}
+                      style={{ color: "aliceblue" }}
+                    >
                       <Visibility />
                     </IconButton>
                   </TableCell>
