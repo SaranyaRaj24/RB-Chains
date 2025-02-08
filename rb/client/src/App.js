@@ -12,6 +12,7 @@ import Lot from "./Components/Lot/lot";
 import Billing from "./Components/Billing/billing";
 import Report from "./Components/Report/report";
 import Process from "./Components/Lot/process";
+import Transaction from "./Components/Customer/Transaction";
 
 function Layout() {
   const location = useLocation();
@@ -27,7 +28,8 @@ function Layout() {
         <Route path="/lot" element={<Lot />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/report" element={<Report />} />
-        <Route path="/process"element={<Process/>}></Route>
+        <Route path="/process" element={<Process />}></Route>
+        <Route path="/transaction/:name" element={<Transaction />} />
       </Routes>
     </>
   );

@@ -8,25 +8,29 @@ import {
   DialogTitle,
   TextField,
   Typography,
-  Card,
-  CardContent,
-  Grid,
-  InputAdornment,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   IconButton,
+  InputAdornment,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 function Lot() {
   const [open, setOpen] = useState(false);
   const [lotName, setLotName] = useState("");
   const [lots, setLots] = useState([]);
   const [search, setSearch] = useState("");
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -53,9 +57,7 @@ function Lot() {
 
   const handleSearchChange = (e) => setSearch(e.target.value);
 
- 
   const handleView = (lot) => {
-   
     navigate("/process", { state: { lotName: lot } });
   };
 
@@ -151,71 +153,88 @@ function Lot() {
         </DialogActions>
       </Dialog>
 
-      <Grid
-        container
-        spacing={0.5}
-        style={{
-          marginTop: "10px",
-          justifyContent: "center",
-          display: "flex",
-          flexWrap: "wrap",
-        }}
-      >
-        {lots
-          .filter((lot) => lot.toLowerCase().includes(search.toLowerCase()))
-          .map((lot, index) => (
-            <Grid item key={index}>
-              <Card
+      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+        <Table>
+          <TableHead>
+            <TableRow
+              style={{ background: "linear-gradient(to right, #000, #d4af37)" }}
+            >
+              <TableCell
                 style={{
-                  background: "linear-gradient(to bottom, #000, #d4af37)",
                   color: "#fff",
-                  borderRadius: 8,
-                  boxShadow: "0 2px 4px rgba(0, 0, 0, 0.3)",
-                  textAlign: "center",
-                  width: "10rem",
-                  height: "90px",
-                  margin: "4px",
+                  fontWeight: "bold",
+                  fontSize: "1.2rem",
                 }}
               >
-                <CardContent style={{ padding: "8px" }}>
-                  <Typography
-                    variant="body1"
+                SI. No
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  fontSize: "1.2rem",
+                }}
+              >
+                Lot Name
+              </TableCell>
+              <TableCell
+                style={{
+                  color: "#fff",
+                  fontWeight: "bold",
+                  fontSize: "1.2rem",
+                }}
+              >
+                Actions
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {lots
+              .filter((lot) => lot.toLowerCase().includes(search.toLowerCase()))
+              .map((lot, index) => (
+                <TableRow
+                  key={index}
+                  style={{
+                    background: index % 2 === 0 ? "#000" : "#d4af37",
+                    color: index % 2 === 0 ? "#fff" : "#000",
+                    
+                  }}
+                >
+                  <TableCell
                     style={{
-                      fontSize: "21px",
-                      fontWeight: "bold",
-                      color: "#fff",
+                      color: index % 2 === 0 ? "#fff" : "#000",
+                      fontSize: "1rem",
+                      fontWeight:"bold",
                     }}
+                  >
+                    {index + 1}
+                  </TableCell>
+                  <TableCell
+                    style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
                   >
                     {lot}
-                  </Typography>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      gap: "5px",
-                    }}
-                  >
+                  </TableCell>
+                  <TableCell>
                     <IconButton
                       size="small"
-                      style={{ color: "#fff" }}
-                      onClick={() => handleView(lot)} 
+                      style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
+                      onClick={() => handleView(lot)}
                     >
                       <VisibilityIcon fontSize="small" />
                     </IconButton>
                     <IconButton
                       size="small"
-                      style={{ color: "#fff" }}
+                      style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
                       onClick={() => handleDelete(index)}
                     >
                       <DeleteIcon fontSize="small" />
                     </IconButton>
-                  </div>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-      </Grid>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <ToastContainer
         autoClose={3000}
@@ -239,3 +258,5 @@ function Lot() {
 }
 
 export default Lot;
+
+
