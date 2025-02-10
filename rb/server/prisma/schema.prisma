@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Lot {
+  id          Int      @id @default(autoincrement())
+  lot_name    String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+model CustomerInfo {
+  customer_id        Int    @id @default(autoincrement())
+  customer_name      String
+  customer_shop_name String
+  phone_number       String
+  address            String
+}
