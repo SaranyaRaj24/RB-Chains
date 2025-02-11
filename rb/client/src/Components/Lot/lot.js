@@ -1,13 +1,9 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Edit, Delete } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
+import axios from "axios";
 import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-  Typography,
   Table,
   TableBody,
   TableCell,
@@ -15,219 +11,298 @@ import {
   TableHead,
   TableRow,
   Paper,
-  IconButton,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { toast, ToastContainer } from "react-toastify";
+import {  Search } from "@mui/icons-material";
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 
-function Lot() {
-  const [open, setOpen] = useState(false);
-  const [lotName, setLotName] = useState("");
+
+
+const Lot = () => {
   const [lots, setLots] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [newLot, setNewLot] = useState({
+    lot_name: "",
+    lot_before_weight: "",
+    lot_after_weight: "",
+    lot_difference_weight: "",
+    lot_comments: "",
+  });
+  const [editMode, setEditMode] = useState(false);
+  const [selectedLot, setSelectedLot] = useState(null);
   const [search, setSearch] = useState("");
-  const navigate = useNavigate();
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
-    setLotName("");
-  };
+  useEffect(() => {
+    fetchLots();
+  }, []);
 
-  const handleChange = (e) => setLotName(e.target.value);
+  const fetchLots = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/lot/lotinfo");
+      console.log("Fetched lots:", response.data);
 
-  const handleSave = () => {
-    if (!lotName) {
-      alert("Please enter a lot name");
-      return;
+      if (Array.isArray(response.data)) {
+        setLots(response.data);
+      } else if (Array.isArray(response.data.data)) {
+        setLots(response.data.data);
+      } else {
+        console.error("Unexpected response format:", response.data);
+        toast.error("Failed to fetch lots. Unexpected data format.");
+      }
+    } catch (error) {
+      console.error("Error fetching lots:", error);
+      toast.error("Failed to fetch lots.");
     }
-    setLots([...lots, lotName]);
-    handleClose();
-    toast.success("Lot created successfully!");
   };
 
-  const handleDelete = (index) => {
-    setLots(lots.filter((_, i) => i !== index));
-    toast.error("Lot deleted successfully!");
+
+const handleInputChange = (e) => {
+  const { name, value } = e.target;
+
+  
+  if (["lot_before_weight", "lot_after_weight"].includes(name)) {
+    const updatedValue = value === "" ? "" : parseFloat(value);
+    const updatedLot = { ...newLot, [name]: updatedValue };
+
+   
+    if (updatedLot.lot_before_weight && updatedLot.lot_after_weight) {
+      updatedLot.lot_difference_weight = Math.abs(
+        updatedLot.lot_after_weight - updatedLot.lot_before_weight
+      );
+    }
+
+    setNewLot(updatedLot);
+  } else {
+    setNewLot({ ...newLot, [name]: value });
+  }
+};
+
+  const handleAddLot = async () => {
+    try {
+      const payload = {
+        ...newLot,
+        lot_before_weight: parseFloat(newLot.lot_before_weight),
+        lot_after_weight: parseFloat(newLot.lot_after_weight),
+        lot_difference_weight: parseFloat(newLot.lot_difference_weight),
+      };
+
+      await axios.post("http://localhost:5000/api/lot/lotinfo", payload);
+      fetchLots();
+      setOpen(false);
+      setNewLot({
+        lot_name: "",
+        lot_before_weight: "",
+        lot_after_weight: "",
+        lot_difference_weight: "",
+        lot_comments: "",
+      });
+        console.log("Lot added successfully");
+  toast.success("Lot added successfully");
+
+    } catch (error) {
+      console.error("Error adding lot:", error);
+      toast.error("Failed to add lot");
+    }
   };
 
-  const handleSearchChange = (e) => setSearch(e.target.value);
+  const handleEditLot = (lot) => {
+    setSelectedLot(lot);
 
-  const handleView = (lot) => {
-    navigate("/process", { state: { lotName: lot } });
+    setNewLot({
+      lot_name: lot.lot_name || "",
+      lot_before_weight: lot.lot_before_weight
+        ? lot.lot_before_weight.toString()
+        : "",
+      lot_after_weight: lot.lot_after_weight
+        ? lot.lot_after_weight.toString()
+        : "",
+      lot_difference_weight: lot.lot_difference_weight
+        ? lot.lot_difference_weight.toString()
+        : "",
+      lot_comments: lot.lot_comments || "",
+    });
+
+    setEditMode(true);
+    setOpen(true);
+  };
+
+  const handleUpdateLot = async () => {
+    try {
+      const payload = {
+        ...newLot,
+        lot_before_weight: parseFloat(newLot.lot_before_weight),
+        lot_after_weight: parseFloat(newLot.lot_after_weight),
+        lot_difference_weight: parseFloat(newLot.lot_difference_weight),
+      };
+
+      console.log("Updating lot with ID:", selectedLot.id);
+      console.log("Payload:", payload);
+
+      await axios.put(
+        `http://localhost:5000/api/lot/lotinfo/${selectedLot.id}`,
+        payload
+      );
+      fetchLots();
+      setOpen(false);
+      setEditMode(false);
+      resetNewLot();
+      toast.success("Lot updated successfully");
+    } catch (error) {
+      console.error("Error updating lot:", error.response || error.message);
+      toast.error("Failed to update lot");
+    }
+  };
+
+  const handleDeleteLot = async (id) => {
+    try {
+      console.log("Deleting lot with ID:", id);
+
+      await axios.delete(`http://localhost:5000/api/lot/lotinfo/${id}`);
+
+      fetchLots();
+      toast.success("Lot deleted successfully");
+    } catch (error) {
+      console.error("Error deleting lot:", error.response || error.message);
+      toast.error("Failed to delete lot");
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+  };
+
+  const resetNewLot = () => {
+    setNewLot({
+      lot_name: "",
+      lot_before_weight: "",
+      lot_after_weight: "",
+      lot_difference_weight: "",
+      lot_comments: "",
+    });
+  };
+
+  const formatWeight = (weight) => {
+    return weight ? parseFloat(weight).toFixed(2) : "0.00";
   };
 
   return (
-    <div
-      style={{
-        maxWidth: "80%",
-        margin: "auto",
-        padding: "20px",
-      }}
-    >
-      <Typography
-        variant="h4"
+    <div style={{ padding: 20, justifyContent: "center" }}>
+      <h1
         style={{
-          fontWeight: "bold",
-          background: "linear-gradient(to right, #d4af37, #000)",
+          textAlign: "center",
+          background: "linear-gradient(45deg, gold, black)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
-          marginBottom: "20px",
-          textAlign: "center",
+          position: "relative",
+          top: "-20px",
         }}
       >
-        List of Lots
-      </Typography>
+        Lot Information
+      </h1>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        style={{ marginTop: "60px" }}
+      />
 
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
+          textAlign: "center",
+          marginBottom: 20,
         }}
       >
-        <Button
-          variant="contained"
-          onClick={handleOpen}
-          style={{
-            backgroundColor: "#d4af37",
-            color: "#000",
-            fontWeight: "bold",
-            width: "150px",
-          }}
-        >
-          Create Lot
-        </Button>
-
         <TextField
-          label="Search Lot Name"
+          placeholder="Search Lot Name"
           value={search}
           onChange={handleSearchChange}
-          variant="outlined"
-          placeholder="Search lot name"
-          style={{
-            backgroundColor: "#fff",
-            width: "30%",
-            borderRadius: "8px",
-          }}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <SearchIcon style={{ color: "#d4af37" }} />
+                <Search />
               </InputAdornment>
             ),
           }}
         />
+
+        <Button
+          style={{
+            backgroundColor: "#d4af37",
+            color: "#000",
+            fontWeight: "bold",
+            height: "2.2rem",
+          }}
+          variant="contained"
+          color="primary"
+          onClick={() => setOpen(true)}
+        >
+          Create lot
+        </Button>
       </div>
-
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create New Lot</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="Enter Lot Name"
-            value={lotName}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} style={{ color: "#000" }}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSave}
-            style={{
-              backgroundColor: "#d4af37",
-              color: "#000",
-              fontWeight: "bold",
-            }}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <TableContainer component={Paper} style={{ marginTop: "20px" }}>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow
-              style={{ background: "linear-gradient(to right, #000, #d4af37)" }}
-            >
-              <TableCell
-                style={{
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                }}
-              >
-                SI. No
+            <TableRow style={{ backgroundColor: "#f5f5f5" }}>
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
+                SI.No
               </TableCell>
-              <TableCell
-                style={{
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                }}
-              >
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
                 Lot Name
               </TableCell>
-              <TableCell
-                style={{
-                  color: "#fff",
-                  fontWeight: "bold",
-                  fontSize: "1.2rem",
-                }}
-              >
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
+                Before Weight
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
+                After Weight
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
+                Difference Weight
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
+                Comments
+              </TableCell>
+              <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
                 Actions
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {lots
-              .filter((lot) => lot.toLowerCase().includes(search.toLowerCase()))
+            {(lots || [])
+              .filter((lot) =>
+                lot.lot_name.toLowerCase().includes(search.toLowerCase())
+              )
               .map((lot, index) => (
-                <TableRow
-                  key={index}
-                  style={{
-                    background: index % 2 === 0 ? "#000" : "#d4af37",
-                    color: index % 2 === 0 ? "#fff" : "#000",
-                    
-                  }}
-                >
-                  <TableCell
-                    style={{
-                      color: index % 2 === 0 ? "#fff" : "#000",
-                      fontSize: "1rem",
-                      fontWeight:"bold",
-                    }}
-                  >
-                    {index + 1}
+                <TableRow key={lot.lot_id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{lot.lot_name}</TableCell>
+                  <TableCell>{formatWeight(lot.lot_before_weight)}</TableCell>
+                  <TableCell>{formatWeight(lot.lot_after_weight)}</TableCell>
+                  <TableCell>
+                    {formatWeight(lot.lot_difference_weight)}
                   </TableCell>
-                  <TableCell
-                    style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
-                  >
-                    {lot}
-                  </TableCell>
+                  <TableCell>{lot.lot_comments}</TableCell>
                   <TableCell>
                     <IconButton
-                      size="small"
-                      style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
-                      onClick={() => handleView(lot)}
+                      color="black"
+                      onClick={() => handleEditLot(lot)}
+                      sx={{ color: "black" }}
                     >
-                      <VisibilityIcon fontSize="small" />
+                      <Edit />
                     </IconButton>
                     <IconButton
-                      size="small"
-                      style={{ color: index % 2 === 0 ? "#fff" : "#000" }}
-                      onClick={() => handleDelete(index)}
+                      color="secondary"
+                      onClick={() => handleDeleteLot(lot.id)}
+                      sx={{ color: "red" }}
                     >
-                      <DeleteIcon fontSize="small" />
+                      <Delete />
                     </IconButton>
                   </TableCell>
                 </TableRow>
@@ -236,27 +311,62 @@ function Lot() {
         </Table>
       </TableContainer>
 
-      <ToastContainer
-        autoClose={3000}
-        hideProgressBar
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        style={{
-          marginTop: "60px",
-          zIndex: 9999,
-          fontSize: "18px",
-          padding: "16px",
-          minHeight: "60px",
-        }}
-      />
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>{editMode ? "Edit Lot" : "Add New Lot"}</DialogTitle>
+        <DialogContent>
+          <TextField
+            margin="dense"
+            label="Lot Name"
+            name="lot_name"
+            value={newLot.lot_name}
+            onChange={handleInputChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Before Weight"
+            name="lot_before_weight"
+            type="number"
+            value={newLot.lot_before_weight}
+            onChange={handleInputChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="After Weight"
+            name="lot_after_weight"
+            type="number"
+            value={newLot.lot_after_weight}
+            onChange={handleInputChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Difference Weight"
+            name="lot_difference_weight"
+            type="number"
+            value={newLot.lot_difference_weight}
+            onChange={handleInputChange}
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Comments"
+            name="lot_comments"
+            value={newLot.lot_comments}
+            onChange={handleInputChange}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={editMode ? handleUpdateLot : handleAddLot}>
+            {editMode ? "Update" : "Add"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
-}
+};
 
 export default Lot;
-
-

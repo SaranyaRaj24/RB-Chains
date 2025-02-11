@@ -49,7 +49,7 @@ const updateCustomer = async (req, res) => {
       where: { customer_id: parseInt(customer_id) },
       data: {
         customer_name,
-        customer_shop_name,
+        customer_shop_name, 
         phone_number,
         address,
       },
