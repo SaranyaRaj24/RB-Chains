@@ -1,32 +1,22 @@
 const express = require("express");
+const router = express.Router();
 const {
-  postLotInfo,
+  createLotInfo,
   getAllLots,
-  getLotById,
-  deleteLot,
-  updateLotData,
+  updateLotInfo,
+  deleteLotInfo,
 } = require("../controllers/lot.controller");
 
-const router = express.Router();
+// Create a new lot
+router.post("/lotinfo", createLotInfo);
 
-// Create a lot
-// POST /api/lot/lot_info
-router.post("/lot_info", postLotInfo);
+// Get all lots
+router.get("/lotinfo", getAllLots);
 
-// Fetch all lots
-// GET /api/lot
-router.get("/", getAllLots);
-
-// Get details of a specific lot
-// POST /api/lot/lot_data
-router.post("/lot_data", getLotById);
+// Update a lot by ID
+router.put("/lotinfo/:id", updateLotInfo);
 
 // Delete a lot by ID
-// DELETE /api/lot/lot_info/:lot_id
-router.delete("/lot_info/:lot_id", deleteLot);
-
-// Update lot info
-// POST /api/lot/modify_lot
-router.post("/modify_lot", updateLotData);
+router.delete("/lotinfo/:id", deleteLotInfo);
 
 module.exports = router;
