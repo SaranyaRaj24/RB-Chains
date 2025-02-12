@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import axios from "axios";
 import {
@@ -22,6 +22,9 @@ import {
 import {  Search } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
+
+
 
 
 
@@ -132,6 +135,12 @@ const handleInputChange = (e) => {
     setEditMode(true);
     setOpen(true);
   };
+  const navigate = useNavigate();
+const handleViewLot = (id, lotName) => {
+  const formattedLotName = encodeURIComponent(lotName); 
+  navigate(`/process/id:${id}/lot_name:${formattedLotName}`);
+};
+
 
   const handleUpdateLot = async () => {
     try {
@@ -297,6 +306,14 @@ const handleInputChange = (e) => {
                     >
                       <Edit />
                     </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleViewLot(lot.id, lot.lot_name)}
+                      sx={{ color: "#25274D" }}
+                    >
+                      <Visibility />
+                    </IconButton>
+
                     <IconButton
                       color="secondary"
                       onClick={() => handleDeleteLot(lot.id)}

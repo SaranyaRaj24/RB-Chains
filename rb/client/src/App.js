@@ -28,7 +28,7 @@ function Layout() {
         <Route path="/lot" element={<Lot />} />
         <Route path="/billing" element={<Billing />} />
         <Route path="/report" element={<Report />} />
-        <Route path="/process" element={<Process />}></Route>
+        <Route path="/process/:id/:lotName" element={<Process />} />
         <Route path="/transaction/:name" element={<Transaction />} />
       </Routes>
     </>
