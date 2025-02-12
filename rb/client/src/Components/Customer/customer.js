@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -21,6 +21,7 @@ import {
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
 
 function Customer() {
   const [open, setOpen] = useState(false);
@@ -32,79 +33,113 @@ function Customer() {
     address: "",
   });
   const [customers, setCustomers] = useState([]);
-
-  const navigate = useNavigate(); 
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const navigate = useNavigate();
 
   const handleOpen = () => {
     setCustomer({ name: "", shop: "", phone: "", address: "" });
     setEditIndex(null);
     setOpen(true);
   };
+
   const handleClose = () => setOpen(false);
 
   const handleChange = (e) => {
     setCustomer({ ...customer, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    if (
-      !customer.name ||
-      !customer.shop ||
-      !customer.phone ||
-      !customer.address
-    ) {
-      toast.error("⚠️ Please fill in all fields!", {
-        containerId: "custom-toast",
-        theme: "dark",
-      });
-      return;
+  const fetchCustomers = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/customer/customerinfo"
+      );
+      setCustomers(response.data);
+    } catch (error) {
+      toast.error("Error fetching customers!", { containerId: "custom-toast" });
+      console.error("Error:", error);
     }
-    if (!/^\d{10}$/.test(customer.phone)) {
-      toast.error("Phone number must be 10 digits!", {
-        containerId: "custom-toast",
-        theme: "dark",
-      });
-      return;
-    }
+  };
 
-    if (editIndex !== null) {
-      const updatedCustomers = [...customers];
-      updatedCustomers[editIndex] = customer;
-      setCustomers(updatedCustomers);
-      toast.success("Customer details updated successfully!", {
-        containerId: "custom-toast",
-        autoClose: 2000,
-      });
-    } else {
-      setCustomers([...customers, customer]);
-      toast.success("Customer details added successfully!", {
-        containerId: "custom-toast",
-        autoClose: 2000,
-      });
-    }
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
 
-    handleClose();
+  const handleSave = async () => {
+    try {
+      const payload = {
+        customer_name: customer.name,
+        customer_shop_name: customer.shop,
+        phone_number: customer.phone,
+        address: customer.address,
+      };
+
+      if (!customer.name) {
+        toast.error("Customer name is required!", { autoClose: 2000 });
+        return;
+      }
+
+      if (editIndex !== null) {
+        await axios.put(
+          `http://localhost:5000/api/customer/customer_info/${customers[editIndex].customer_id}`,
+          payload
+        );
+        toast.success("Customer updated successfully!", { autoClose: 2000 });
+      } else {
+        await axios.post(
+          "http://localhost:5000/api/customer/customer_info",
+          payload
+        );
+        toast.success("Customer added successfully!", { autoClose: 2000 });
+      }
+
+      fetchCustomers();
+      setOpen(false);
+      setCustomer({ name: "", shop: "", phone: "", address: "" });
+    } catch (error) {
+      console.error(
+        "Error saving customer:",
+        error.response ? error.response.data : error.message
+      );
+      toast.error("Failed to save customer!", { autoClose: 2000 });
+    }
   };
 
   const handleEdit = (index) => {
-    setCustomer(customers[index]);
+    const selectedCustomer = customers[index];
+    setCustomer({
+      name: selectedCustomer.customer_name,
+      shop: selectedCustomer.customer_shop_name,
+      phone: selectedCustomer.phone_number,
+      address: selectedCustomer.address,
+    });
     setEditIndex(index);
     setOpen(true);
   };
 
-  const handleDelete = (index) => {
-    const updatedCustomers = customers.filter((_, i) => i !== index);
-    setCustomers(updatedCustomers);
-    toast.error("Deleted successfully!", {
-      containerId: "custom-toast",
-      autoClose: 2000,
-    });
+  const handleDelete = async (customer_id) => {
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/customer/customer_info/${customer_id}`
+      );
+      fetchCustomers();
+      toast.success("Customer deleted successfully!", { autoClose: 2000 });
+    } catch (error) {
+      console.error(
+        "Error deleting customer:",
+        error.response?.data || error.message
+      );
+      toast.error("Failed to delete customer!", { autoClose: 2000 });
+    }
   };
-
 
   const handleView = (customer) => {
     navigate(`/transaction/${customer.name}`, { state: { customer } });
   };
+
+
+  const filteredCustomers = customers.filter((cust) =>
+    cust.customer_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div
@@ -115,16 +150,6 @@ function Customer() {
         textAlign: "center",
       }}
     >
-      <ToastContainer
-        containerId="custom-toast"
-        position="top-right"
-        autoClose={2000}
-        style={{
-          marginTop: "80px",
-          zIndex: 9999,
-        }}
-      />
-
       <Typography
         variant="h4"
         style={{
@@ -138,6 +163,21 @@ function Customer() {
         Customer List
       </Typography>
 
+      {/* <TextField
+        variant="outlined"
+        placeholder="Search Customer Name"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        style={{
+          marginBottom: 20,
+        }}
+      />
+  <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        style={{ marginTop: "60px" }}
+      />
+
       <Button
         variant="contained"
         onClick={handleOpen}
@@ -145,10 +185,44 @@ function Customer() {
           backgroundColor: "#d4af37",
           color: "#000",
           fontWeight: "bold",
+          marginLeft: 20,
         }}
       >
         Add Customer
-      </Button>
+      </Button> */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        style={{ marginTop: "60px" }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 20,
+        }}
+      >
+        <TextField
+          variant="outlined"
+          placeholder="Search Customer Name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ width: 350, marginRight: 20 }}
+        />
+        <Button
+          variant="contained"
+          onClick={handleOpen}
+          style={{
+            backgroundColor: "#d4af37",
+            color: "#000",
+            fontWeight: "bold",
+          }}
+        >
+          Add Customer
+        </Button>
+      </div>
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>
@@ -207,7 +281,7 @@ function Customer() {
         </DialogActions>
       </Dialog>
 
-      {customers.length > 0 && (
+      {filteredCustomers.length > 0 ? (
         <TableContainer
           component={Paper}
           style={{ marginTop: 30, borderRadius: 10, overflow: "hidden" }}
@@ -216,7 +290,7 @@ function Customer() {
             style={{ minWidth: "100%", backgroundColor: "#000", color: "#fff" }}
           >
             <TableHead>
-              <TableRow style={{ backgroundColor: "#d4af37" }}>
+              <TableRow style={{ backgroundColor: "#f5f5f5" }}>
                 <TableCell style={styles.headerCell}>Customer Name</TableCell>
                 <TableCell style={styles.headerCell}>Shop Name</TableCell>
                 <TableCell style={styles.headerCell}>Phone Number</TableCell>
@@ -225,32 +299,35 @@ function Customer() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {customers.map((cust, index) => (
+              {filteredCustomers.map((cust, index) => (
                 <TableRow
-                  key={index}
+                  key={cust.id}
                   style={index % 2 === 0 ? styles.evenRow : styles.oddRow}
                 >
-                  <TableCell style={styles.cell}>{cust.name}</TableCell>
-                  <TableCell style={styles.cell}>{cust.shop}</TableCell>
-                  <TableCell style={styles.cell}>{cust.phone}</TableCell>
+                  <TableCell style={styles.cell}>
+                    {cust.customer_name}
+                  </TableCell>
+                  <TableCell style={styles.cell}>
+                    {cust.customer_shop_name}
+                  </TableCell>
+                  <TableCell style={styles.cell}>{cust.phone_number}</TableCell>
                   <TableCell style={styles.cell}>{cust.address}</TableCell>
-
                   <TableCell style={styles.cell}>
                     <IconButton
                       onClick={() => handleEdit(index)}
-                      style={{ color: "aliceblue" }}
+                      style={{ color: "black" }}
                     >
                       <Edit />
                     </IconButton>
                     <IconButton
-                      onClick={() => handleDelete(index)}
-                      style={{ color: "aliceblue" }}
+                      onClick={() => handleDelete(cust.customer_id)}
+                      style={{ color: "red" }}
                     >
                       <Delete />
                     </IconButton>
                     <IconButton
                       onClick={() => handleView(cust)}
-                      style={{ color: "aliceblue" }}
+                      style={{ color: "#25274D" }}
                     >
                       <Visibility />
                     </IconButton>
@@ -260,6 +337,10 @@ function Customer() {
             </TableBody>
           </Table>
         </TableContainer>
+      ) : (
+        <Typography variant="h6" style={{ marginTop: 20 }}>
+          No customers found.
+        </Typography>
       )}
     </div>
   );
@@ -273,16 +354,17 @@ const styles = {
     fontSize: 18,
   },
   cell: {
-    color: "#fff",
+    color: "black",
     textAlign: "center",
     fontSize: 16,
   },
   evenRow: {
-    backgroundColor: "#333",
+    backgroundColor: "#fff",
   },
   oddRow: {
-    backgroundColor: "#444",
+    backgroundColor: "#fff",
   },
 };
+
 
 export default Customer;
