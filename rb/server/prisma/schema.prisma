@@ -10,9 +10,9 @@ datasource db {
 model LotInfo {
   id                    Int      @id @default(autoincrement())
   lot_name              String
-  lot_before_weight     Float
-  lot_after_weight      Float
-  lot_difference_weight Float
+  lot_before_weight     Float?
+  lot_after_weight      Float?
+  lot_difference_weight Float?
   lot_comments          String?
   is_completed          Boolean   @default(false)
   createdAt             DateTime  @default(now())
@@ -24,7 +24,7 @@ model LotInfo {
 model CustomerInfo {
   customer_id        Int    @id @default(autoincrement())
   customer_name      String
-  customer_shop_name String
-  phone_number       String
-  address            String
+  customer_shop_name String?
+  phone_number       String?
+  address            String?
 }

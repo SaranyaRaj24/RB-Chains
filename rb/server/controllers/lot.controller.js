@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Create a new lot
 const createLotInfo = async (req, res) => {
   const {
     lot_name,
@@ -11,24 +10,33 @@ const createLotInfo = async (req, res) => {
     lot_comments,
     is_completed,
   } = req.body;
+
+  console.log("Incoming payload:", req.body); 
+
+  
+  if (!lot_name) {
+    return res.status(400).json({ error: "Lot name is required" });
+  }
+
   try {
+   
     const newLot = await prisma.lotInfo.create({
       data: {
         lot_name,
-        lot_before_weight,
-        lot_after_weight,
-        lot_difference_weight,
-        lot_comments,
-        is_completed,
+        lot_before_weight: lot_before_weight || null,
+        lot_after_weight: lot_after_weight || null,
+        lot_difference_weight: lot_difference_weight || null,
+        lot_comments: lot_comments || null,
+        is_completed: is_completed || false,
       },
     });
+
     res.status(201).json(newLot);
   } catch (error) {
+    console.error("Error creating lot:", error);
     res.status(400).json({ error: error.message });
   }
 };
-
-// Get all lots
 const getAllLots = async (req, res) => {
   try {
     const lots = await prisma.lotInfo.findMany();
@@ -38,9 +46,9 @@ const getAllLots = async (req, res) => {
   }
 };
 
-// Update a lot by lot_id
+
 const updateLotInfo = async (req, res) => {
-  const { id } = req.params; // This is still fine as long as frontend sends lot_id as 'id'
+  const { id } = req.params; 
   const {
     lot_name,
     lot_before_weight,
@@ -68,13 +76,13 @@ const updateLotInfo = async (req, res) => {
   }
 };
 
-// Delete a lot by lot_id
+
 const deleteLotInfo = async (req, res) => {
   const { id } = req.params;
 
   try {
     await prisma.lotInfo.delete({
-      where: { id: parseInt(id) }, // Correctly using 'id' as per your model
+      where: { id: parseInt(id) }, 
     });
     res
       .status(200)

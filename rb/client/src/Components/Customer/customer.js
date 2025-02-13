@@ -22,6 +22,8 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
+import { REACT_APP_BACKEND_SERVER_URL } from "../../config/config";
+
 
 function Customer() {
   const [open, setOpen] = useState(false);
@@ -50,9 +52,9 @@ function Customer() {
 
   const fetchCustomers = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/customer/customerinfo"
-      );
+    const response = await axios.get(
+      `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customerinfo`
+    );
       setCustomers(response.data);
     } catch (error) {
       toast.error("Error fetching customers!", { containerId: "custom-toast" });
@@ -79,16 +81,16 @@ function Customer() {
       }
 
       if (editIndex !== null) {
-        await axios.put(
-          `http://localhost:5000/api/customer/customer_info/${customers[editIndex].customer_id}`,
-          payload
-        );
+       await axios.put(
+         `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customer_info/${customers[editIndex].customer_id}`,
+         payload
+       );
         toast.success("Customer updated successfully!", { autoClose: 2000 });
       } else {
         await axios.post(
-          "http://localhost:5000/api/customer/customer_info",
-          payload
-        );
+  `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customer_info`,
+  payload
+);
         toast.success("Customer added successfully!", { autoClose: 2000 });
       }
 
@@ -118,9 +120,9 @@ function Customer() {
 
   const handleDelete = async (customer_id) => {
     try {
-      await axios.delete(
-        `http://localhost:5000/api/customer/customer_info/${customer_id}`
-      );
+     await axios.delete(
+       `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customer_info/${customer_id}`
+     );
       fetchCustomers();
       toast.success("Customer deleted successfully!", { autoClose: 2000 });
     } catch (error) {
@@ -163,33 +165,6 @@ function Customer() {
         Customer List
       </Typography>
 
-      {/* <TextField
-        variant="outlined"
-        placeholder="Search Customer Name"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        style={{
-          marginBottom: 20,
-        }}
-      />
-  <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        style={{ marginTop: "60px" }}
-      />
-
-      <Button
-        variant="contained"
-        onClick={handleOpen}
-        style={{
-          backgroundColor: "#d4af37",
-          color: "#000",
-          fontWeight: "bold",
-          marginLeft: 20,
-        }}
-      >
-        Add Customer
-      </Button> */}
       <ToastContainer
         position="top-right"
         autoClose={3000}

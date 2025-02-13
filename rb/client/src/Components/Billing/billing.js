@@ -3,62 +3,72 @@ import React, { useState, useEffect, useRef } from "react";
 import { Autocomplete, TextField, Box, Button } from "@mui/material";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const Billing = () => {
-  const customers = [
-    {
-      id: 1,
-      name: "John",
-      address: "123 Main St, Springfield",
-      phone: "123-456-7890",
-    },
-    {
-      id: 2,
-      name: "J Smith",
-      address: "456 Elm St, Metropolis",
-      phone: "987-654-3210",
-    },
-    {
-      id: 3,
-      name: "Alice",
-      address: "789 Oak St, Gotham",
-      phone: "555-123-4567",
-    },
-    {
-      id: 4,
-      name: "Charlie",
-      address: "101 Maple St, Star City",
-      phone: "321-654-0987",
-    },
-    {
-      id: 5,
-      name: "Chris",
-      address: "505 Pine St, Central City",
-      phone: "789-012-3456",
-    },
-  ];
-
+  const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [billItems, setBillItems] = useState([]); 
   const [billNo, setBillNo] = useState("001");
-  const [date, setDate] = useState(new Date().toLocaleDateString());
-  const [time, setTime] = useState(new Date().toLocaleTimeString());
-  const [isPrinting, setIsPrinting] = useState(false); 
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [isPrinting, setIsPrinting] = useState(false);
   const billRef = useRef();
 
+  const products = [
+    { id: "P001", name: "Gold Ring" },
+    { id: "P002", name: "Silver Necklace" },
+    { id: "P003", name: "Diamond Earrings" },
+    { id: "P004", name: "Platinum Bracelet" },
+  ];
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
-    }, 1000);
+    const fetchCustomers = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_SERVER_URL}/api/customer/customerinfo`
+        );
+        console.log("Fetched Customers:", response.data);
+        setCustomers(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        toast.error("Error fetching customers!", {
+          containerId: "custom-toast",
+        });
+        console.error("Error:", error);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setDate(now.toLocaleDateString("en-IN"));
+      setTime(
+        now.toLocaleTimeString("en-IN", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
+    };
+
+    updateTime();
+    const timer = setInterval(updateTime, 60000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleCustomerChange = (event, newValue) => {
-    setSelectedCustomer(newValue);
+  const handleProductSelect = (event, newValue) => {
+    if (newValue && !billItems.some((item) => item.id === newValue.id)) {
+      setBillItems((prevItems) => [...prevItems, newValue]); 
+    }
   };
 
   const handlePrint = () => {
-    setIsPrinting(true); 
-
+    setIsPrinting(true);
     setTimeout(() => {
       html2canvas(billRef.current).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
@@ -70,7 +80,7 @@ const Billing = () => {
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save(`Bill_${billNo}.pdf`);
 
-        setIsPrinting(false); 
+        setIsPrinting(false);
       });
     }, 0);
   };
@@ -90,37 +100,64 @@ const Billing = () => {
       </Box>
 
       <Box
-        sx={styles.customerSection}
-        style={{ display: isPrinting ? "none" : "block" }}
+        sx={styles.searchSection}
+        style={{ display: isPrinting ? "none" : "flex" }}
       >
         <Autocomplete
           options={customers}
-          getOptionLabel={(option) => option.name}
-          onChange={handleCustomerChange}
+          getOptionLabel={(option) => option.customer_name || ""}
+          onChange={(event, newValue) => setSelectedCustomer(newValue)}
           renderInput={(params) => (
-            <TextField {...params} label="Select Customer" variant="outlined" />
+            <TextField
+              {...params}
+              label="Select Customer"
+              variant="outlined"
+              size="small"
+            />
           )}
-          sx={styles.autocomplete}
+          sx={styles.smallAutocomplete}
+        />
+
+        <Autocomplete
+          options={products}
+          getOptionLabel={(option) => option.id}
+          onChange={handleProductSelect}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Search Product ID"
+              variant="outlined"
+              size="small"
+            />
+          )}
+          sx={styles.smallAutocomplete}
         />
       </Box>
-
 
       {selectedCustomer && (
         <Box sx={styles.customerDetails}>
           <h3>Customer Details:</h3>
           <p>
-            <strong>Name:</strong> {selectedCustomer.name}
+            <strong>Name:</strong> {selectedCustomer.customer_name}
           </p>
-          <p>
-            <strong>Address:</strong> {selectedCustomer.address}
-          </p>
-          <p>
-            <strong>Phone:</strong> {selectedCustomer.phone}
-          </p>
+          {selectedCustomer.address && (
+            <p>
+              <strong>Address:</strong> {selectedCustomer.address}
+            </p>
+          )}
+          {selectedCustomer.phone_number && (
+            <p>
+              <strong>Phone:</strong> {selectedCustomer.phone_number}
+            </p>
+          )}
+          {selectedCustomer.customer_shop_name && (
+            <p>
+              <strong>Shop Name:</strong> {selectedCustomer.customer_shop_name}
+            </p>
+          )}
         </Box>
       )}
 
-  
       <Box sx={styles.itemsSection}>
         <h3>Bill Details:</h3>
         <table style={styles.table}>
@@ -133,23 +170,29 @@ const Billing = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td style={styles.td}>Item 1</td>
-              <td style={styles.td}>2</td>
-              <td style={styles.td}>10</td>
-              <td style={styles.td}>20</td>
-            </tr>
-            <tr>
-              <td style={styles.td}>Item 2</td>
-              <td style={styles.td}>1</td>
-              <td style={styles.td}>15</td>
-              <td style={styles.td}>15</td>
-            </tr>
+            {billItems.length > 0 ? (
+              billItems.map((item, index) => (
+                <tr key={index}>
+                  <td style={styles.td}>{item.name}</td>
+                  <td style={styles.td}>2</td>
+                  <td style={styles.td}>10</td>
+                  <td style={styles.td}>20</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="4"
+                  style={{ textAlign: "center", padding: "10px" }}
+                >
+                  No products selected
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Box>
 
-   
       <Button
         variant="contained"
         color="primary"
@@ -173,27 +216,17 @@ const styles = {
     fontFamily: "Arial, sans-serif",
     backgroundColor: "#f9f9f9",
   },
-  heading: {
-    textAlign: "center",
-    color: "black",
-  },
+  heading: { textAlign: "center", color: "black" },
   billInfo: {
     display: "flex",
     justifyContent: "space-between",
     marginBottom: "20px",
   },
-  customerSection: {
-    marginBottom: "20px",
-  },
-  autocomplete: {
-    width: "100%",
+  searchSection: { display: "flex", gap: "10px", marginBottom: "20px" },
+  smallAutocomplete: {
+    width: "48%",
     backgroundColor: "#fff",
     borderRadius: "5px",
-    "& .MuiOutlinedInput-root": {
-      "& fieldset": { borderColor: "#4CAF50" },
-      "&:hover fieldset": { borderColor: "#388E3C" },
-      "&.Mui-focused fieldset": { borderColor: "#2E7D32" },
-    },
   },
   customerDetails: {
     marginBottom: "20px",
@@ -202,22 +235,10 @@ const styles = {
     borderRadius: "5px",
     backgroundColor: "#fff",
   },
-  itemsSection: {
-    marginTop: "20px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-  },
-  th: {
-    border: "1px solid #ddd",
-    padding: "10px",
-    backgroundColor: "#f2f2f2",
-  },
-  td: {
-    border: "1px solid #ddd",
-    padding: "10px",
-  },
+  itemsSection: { marginTop: "20px" },
+  table: { width: "100%", borderCollapse: "collapse" },
+  th: { border: "1px solid #ddd", padding: "10px", backgroundColor: "#f2f2f2" },
+  td: { border: "1px solid #ddd", padding: "10px" },
   printButton: {
     marginTop: "20px",
     display: "block",
@@ -227,6 +248,3 @@ const styles = {
 };
 
 export default Billing;
-
-
-
