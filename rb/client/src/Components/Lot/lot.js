@@ -23,7 +23,7 @@ import {  Search } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-
+import { REACT_APP_BACKEND_SERVER_URL } from "../../config/config";
 
 
 
@@ -48,7 +48,9 @@ const Lot = () => {
 
   const fetchLots = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/lot/lotinfo");
+     const response = await axios.get(
+       `${REACT_APP_BACKEND_SERVER_URL}/api/lot/lotinfo`
+     );
       console.log("Fetched lots:", response.data);
 
       if (Array.isArray(response.data)) {
@@ -94,9 +96,13 @@ const handleInputChange = (e) => {
         lot_before_weight: parseFloat(newLot.lot_before_weight),
         lot_after_weight: parseFloat(newLot.lot_after_weight),
         lot_difference_weight: parseFloat(newLot.lot_difference_weight),
+          
       };
 
-      await axios.post("http://localhost:5000/api/lot/lotinfo", payload);
+      await axios.post(
+        `${REACT_APP_BACKEND_SERVER_URL}/api/lot/lotinfo`,
+        payload
+      );
       fetchLots();
       setOpen(false);
       setNewLot({
@@ -115,6 +121,7 @@ const handleInputChange = (e) => {
     }
   };
 
+  
   const handleEditLot = (lot) => {
     setSelectedLot(lot);
 
@@ -154,10 +161,10 @@ const handleViewLot = (id, lotName) => {
       console.log("Updating lot with ID:", selectedLot.id);
       console.log("Payload:", payload);
 
-      await axios.put(
-        `http://localhost:5000/api/lot/lotinfo/${selectedLot.id}`,
-        payload
-      );
+     await axios.put(
+       `${REACT_APP_BACKEND_SERVER_URL}/api/lot/lotinfo/${selectedLot.id}`,
+       payload
+     );
       fetchLots();
       setOpen(false);
       setEditMode(false);
@@ -173,7 +180,7 @@ const handleViewLot = (id, lotName) => {
     try {
       console.log("Deleting lot with ID:", id);
 
-      await axios.delete(`http://localhost:5000/api/lot/lotinfo/${id}`);
+   await axios.delete(`${REACT_APP_BACKEND_SERVER_URL}/api/lot/lotinfo/${id}`);
 
       fetchLots();
       toast.success("Lot deleted successfully");
