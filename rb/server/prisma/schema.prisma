@@ -15,10 +15,15 @@ model LotInfo {
   lot_difference_weight Float?
   lot_comments          String?
   is_completed          Boolean   @default(false)
+  master_id             Int?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
 
-  @@map("lotInfo") 
+  MasterProcess         MasterProcess? @relation(fields: [master_id], references: [master_id])
+  Items                 Item[]
+  AttributeValues       AttributeValue[]
+
+  @@map("lotInfo")
 }
 
 model CustomerInfo {
@@ -27,4 +32,121 @@ model CustomerInfo {
   customer_shop_name String?
   phone_number       String?
   address            String?
+  MasterOrders       MasterOrder[]
+}
+
+model MasterProcess {
+  master_id   Int    @id @default(autoincrement())
+  process_name String
+  LotInfos     LotInfo[]
+  MasterProcessMappers MasterProcessMapper[]
+}
+
+model MasterProcessMapper {
+  id                Int @id @default(autoincrement())
+  master_id         Int
+  process_id        Int
+  process_order_sort Int
+
+  MasterProcess     MasterProcess @relation(fields: [master_id], references: [master_id])
+  LotProcess       LotProcess @relation(fields: [process_id], references: [process_id])
+}
+
+model LotProcess {
+  process_id         Int    @id @default(autoincrement())
+  process_name       String
+  process_description String?
+  ProcessSteps       ProcessSteps[]
+  ProcessSteps1 MasterProcessMapper[]
+  ProcessSteps2 AttributeValue[]
+}
+
+model ProcessSteps {
+  step_id     Int     @id @default(autoincrement())
+  process_id  Int
+  attribute_id Int
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  LotProcess   LotProcess @relation(fields: [process_id], references: [process_id])
+  AttributesInfo AttributesInfo @relation(fields: [attribute_id], references: [attribute_id])
+}
+
+model AttributesInfo {
+  attribute_id   Int    @id @default(autoincrement())
+  attribute_type String
+  attribute_name String
+  ProcessSteps   ProcessSteps[]
+}
+
+model Item {
+  item_id    Int    @id @default(autoincrement())
+  lot_id     Int
+  item_type  String @default("INITIAL")
+
+  LotInfo    LotInfo @relation(fields: [lot_id], references: [id])
+  MasterJewelItemMappers MasterJewelItemMapper[]
+  ProductStocks ProductStocks[]
+  Item1 AttributeValue[]
+  
+}
+
+model MasterJewelItemMapper {
+  id             Int @id @default(autoincrement())
+  item_id        Int
+  master_jewel_id Int
+
+  Item           Item @relation(fields: [item_id], references: [item_id])
+  MasterJewelType MasterJewelType @relation(fields: [master_jewel_id], references: [master_jewel_id])
+}
+
+model MasterJewelType {
+  master_jewel_id Int @id @default(autoincrement())
+  jewel_name      String
+  MasterJewelItemMappers MasterJewelItemMapper[]
+}
+
+model AttributeValue {
+  attribute_value_id Int @id @default(autoincrement())
+  lot_id            Int
+  process_id        Int
+  item_id           Int
+  value             Float
+
+  LotInfo          LotInfo @relation(fields: [lot_id], references: [id])
+  LotProcess       LotProcess @relation(fields: [process_id], references: [process_id])
+  Item            Item @relation(fields: [item_id], references: [item_id])
+}
+
+model ProductStocks {
+  stock_id       Int    @id @default(autoincrement())
+  item_id        Int
+  product_status String @default("active")
+
+  Item           Item @relation(fields: [item_id], references: [item_id])
+  OrderItems OrderItems[]
+}
+
+model MasterOrder {
+  order_id      Int    @id @default(autoincrement())
+  order_status  String
+  customer_id   Int
+  total_price   Float
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  CustomerInfo  CustomerInfo @relation(fields: [customer_id], references: [customer_id])
+  OrderItems    OrderItems[]
+}
+
+model OrderItems {
+  order_item_id Int @id @default(autoincrement())
+  order_id      Int
+  stock_id      Int
+  final_price   Float
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  MasterOrder   MasterOrder @relation(fields: [order_id], references: [order_id])
+  ProductStocks ProductStocks @relation(fields: [stock_id], references: [stock_id])
 }
