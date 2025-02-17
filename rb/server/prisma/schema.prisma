@@ -56,9 +56,12 @@ model LotProcess {
   process_id         Int    @id @default(autoincrement())
   process_name       String
   process_description String?
+  beforeWeight       Float? 
+  afterWeight        Float? 
+  difference         Float? 
   ProcessSteps       ProcessSteps[]
-  ProcessSteps1 MasterProcessMapper[]
-  ProcessSteps2 AttributeValue[]
+  ProcessSteps1      MasterProcessMapper[]
+  ProcessSteps2      AttributeValue[]
 }
 
 model ProcessSteps {

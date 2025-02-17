@@ -44,47 +44,86 @@ function Process() {
   ];
 
   const handleNext = () => {
-    if (activeStep === 0 && processData[0].beforeWeight === "") {
-      alert("Please enter the gold weight.");
-      return;
-    }
-    if (
-      activeStep === 1 &&
-      (processData[1].beforeWeight === "" || processData[1].afterWeight === "")
-    ) {
-      alert("Please enter both before and after weight.");
-      return;
-    }
-
-    const updatedData = [...processData];
-    if (activeStep > 0 && activeStep !== 3) {
-      const before = parseFloat(updatedData[activeStep].beforeWeight);
-      const after = parseFloat(updatedData[activeStep].afterWeight);
-      updatedData[activeStep].difference = before - after;
-    }
-
-    if (activeStep === 3) {
-      const totalWeight = parseFloat(updatedData[3].beforeWeight);
-      const item1Weight = parseFloat(updatedData[3].item1Weight);
-      const item2Weight = parseFloat(updatedData[3].item2Weight);
-
-      if (item1Weight + item2Weight !== totalWeight) {
-        alert("The sum of item weights must equal the total weight.");
+    if (activeStep === steps.length - 1) {
+      handleFinish();
+    } else {
+      if (activeStep === 0 && processData[0].beforeWeight === "") {
+        alert("Please enter the gold weight.");
+        return;
+      }
+      if (
+        activeStep === 1 &&
+        (processData[1].beforeWeight === "" ||
+          processData[1].afterWeight === "")
+      ) {
+        alert("Please enter both before and after weight.");
         return;
       }
 
-      updatedData[4].beforeWeight = item1Weight;
-      updatedData[5].beforeWeight = item2Weight;
-    }
+      const updatedData = [...processData];
+      if (activeStep > 0 && activeStep !== 3) {
+        const before = parseFloat(updatedData[activeStep].beforeWeight) || 0;
+        const after = parseFloat(updatedData[activeStep].afterWeight) || 0;
+        updatedData[activeStep].difference = before - after;
+      }
 
-    if (activeStep < steps.length - 1 && activeStep !== 3) {
-      updatedData[activeStep + 1].beforeWeight =
-        updatedData[activeStep].afterWeight;
-    }
+      if (activeStep === 3) {
+        const totalWeight = parseFloat(updatedData[3].beforeWeight) || 0;
+        const item1Weight = parseFloat(updatedData[3].item1Weight) || 0;
+        const item2Weight = parseFloat(updatedData[3].item2Weight) || 0;
 
-    setProcessData(updatedData);
-    setActiveStep(activeStep + 1);
+        if (item1Weight + item2Weight !== totalWeight) {
+          alert("The sum of item weights must equal the total weight.");
+          return;
+        }
+
+        updatedData[4].beforeWeight = item1Weight;
+        updatedData[5].beforeWeight = item2Weight;
+      }
+
+      if (activeStep < steps.length - 1 && activeStep !== 3) {
+        updatedData[activeStep + 1].beforeWeight =
+          updatedData[activeStep].afterWeight;
+      }
+
+      setProcessData(updatedData);
+      setActiveStep(activeStep + 1);
+    }
   };
+
+const handleFinish = async () => {
+  console.log("processData before sending:", processData); 
+
+  const processedData = processData.map((process, index) => ({
+    processName: steps[index],
+    beforeWeight: process.beforeWeight,
+    afterWeight: process.afterWeight,
+    difference: process.difference,
+    item1Name: process.item1Name || "",
+    item1Weight: process.item1Weight || null,
+    item2Name: process.item2Name || "",
+    item2Weight: process.item2Weight || null,
+  }));
+
+  console.log("Processed data to send:", processedData); 
+
+  try {
+    const response = await fetch("http://localhost:5000/api/process/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(processedData),
+    });
+
+    const data = await response.json();
+    console.log("Response from backend:", data);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+};
+
+
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
@@ -122,6 +161,7 @@ function Process() {
                 fullWidth
                 margin="normal"
                 type="number"
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               />
             )}
 
@@ -136,6 +176,7 @@ function Process() {
                   fullWidth
                   margin="normal"
                   type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 />
                 <TextField
                   label="Enter After Weight"
@@ -146,6 +187,7 @@ function Process() {
                   fullWidth
                   margin="normal"
                   type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 />
                 {processData[activeStep].difference !== null && (
                   <Typography variant="body1">
@@ -164,6 +206,7 @@ function Process() {
                   fullWidth
                   margin="normal"
                   type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 />
                 <Grid container spacing={2} style={{ marginTop: "10px" }}>
                   <Grid item xs={6}>
@@ -181,6 +224,7 @@ function Process() {
                       onChange={(e) => handleWeightChange(e, 3, "item1Weight")}
                       fullWidth
                       type="number"
+                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -198,6 +242,7 @@ function Process() {
                       onChange={(e) => handleWeightChange(e, 3, "item2Weight")}
                       fullWidth
                       type="number"
+                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                     />
                   </Grid>
                 </Grid>
@@ -215,6 +260,7 @@ function Process() {
                   fullWidth
                   margin="normal"
                   type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 />
                 <TextField
                   label="Enter After Weight"
@@ -225,6 +271,7 @@ function Process() {
                   fullWidth
                   margin="normal"
                   type="number"
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                 />
                 {processData[activeStep].difference !== null && (
                   <Typography variant="body1">
