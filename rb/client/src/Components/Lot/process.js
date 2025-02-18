@@ -9,8 +9,12 @@ import {
   TextField,
   Grid,
 } from "@mui/material";
+import { useParams } from "react-router-dom";
+import {  toast ,ToastContainer} from "react-toastify";
+
 
 function Process() {
+  const { id, lotName } = useParams();
   const [activeStep, setActiveStep] = useState(0);
 
   const [processData, setProcessData] = useState([
@@ -83,7 +87,8 @@ function Process() {
 
       if (activeStep < steps.length - 1 && activeStep !== 3) {
         updatedData[activeStep + 1].beforeWeight =
-          updatedData[activeStep].afterWeight;
+          updatedData[activeStep].afterWeight ||
+          updatedData[activeStep].beforeWeight;
       }
 
       setProcessData(updatedData);
@@ -91,39 +96,46 @@ function Process() {
     }
   };
 
-const handleFinish = async () => {
-  console.log("processData before sending:", processData); 
+  const handleFinish = async () => {
+    console.log("processData before sending:", processData);
 
-  const processedData = processData.map((process, index) => ({
-    processName: steps[index],
-    beforeWeight: process.beforeWeight,
-    afterWeight: process.afterWeight,
-    difference: process.difference,
-    item1Name: process.item1Name || "",
-    item1Weight: process.item1Weight || null,
-    item2Name: process.item2Name || "",
-    item2Weight: process.item2Weight || null,
-  }));
+    const processedData = processData.map((process, index) => ({
+      lotId: id,
+      lot_name: lotName,
+      processName: steps[index],
+      beforeWeight: process.beforeWeight,
+      afterWeight: process.afterWeight,
+      difference: process.difference,
+      item1Name: process.item1Name || "",
+      item1Weight: process.item1Weight || null,
+      item2Name: process.item2Name || "",
+      item2Weight: process.item2Weight || null,
+    }));
 
-  console.log("Processed data to send:", processedData); 
+    console.log("Processed data to send:", processedData);
 
-  try {
-    const response = await fetch("http://localhost:5000/api/process/save", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(processedData),
-    });
+    try {
+      const response = await fetch("http://localhost:5000/api/process/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(processedData),
+      });
 
-    const data = await response.json();
-    console.log("Response from backend:", data);
-  } catch (error) {
-    console.error("Error:", error);
-  }
-};
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
 
+      const data = await response.json();
+      console.log("Response from backend:", data);
 
+      toast.success("Process saved successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to save process. Please try again.");
+    }
+  };
 
   const handleBack = () => {
     setActiveStep(activeStep - 1);
@@ -298,6 +310,11 @@ const handleFinish = async () => {
             >
               Back
             </Button>
+            <ToastContainer
+              position="top-right"
+              autoClose={3000}
+              style={{ marginTop: "60px" }}
+            />
           </div>
         )}
       </div>
