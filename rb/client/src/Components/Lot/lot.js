@@ -145,7 +145,7 @@ const handleInputChange = (e) => {
   const navigate = useNavigate();
 const handleViewLot = (id, lotName) => {
   const formattedLotName = encodeURIComponent(lotName); 
-  navigate(`/process/id:${id}/lot_name:${formattedLotName}`);
+  navigate(`/process/${id}/${formattedLotName}`);
 };
 
 

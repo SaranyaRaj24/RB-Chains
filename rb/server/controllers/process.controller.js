@@ -30,13 +30,49 @@ const saveProcessData = async (req, res) => {
 
     console.log("Processed data before saving:", processData);
 
-    const newProcess = await prisma.lotProcess.createMany({
+  
+    const newProcesses = await prisma.lotProcess.createMany({
       data: processData,
     });
 
+    console.log("Saved lot processes:", newProcesses);
+
+
+    const lastProcess = await prisma.lotProcess.findMany({
+      orderBy: { process_id: "desc" },
+      take: req.body.length,
+    });
+
+    const itemsData = [];
+    lastProcess.forEach((process, index) => {
+      const bodyData = req.body[index];
+      if (bodyData.item1Name && bodyData.item1Weight) {
+        itemsData.push({
+          lotProcessId: process.process_id,
+          item_name: bodyData.item1Name,
+          item_weight: parseFloat(bodyData.item1Weight),
+        });
+      }
+      if (bodyData.item2Name && bodyData.item2Weight) {
+        itemsData.push({
+          lotProcessId: process.process_id,
+          item_name: bodyData.item2Name,
+          item_weight: parseFloat(bodyData.item2Weight),
+        });
+      }
+    });
+
+    console.log("Items data before saving:", itemsData);
+
+
+    if (itemsData.length > 0) {
+      await prisma.lotProcessItems.createMany({
+        data: itemsData,
+      });
+    }
+
     res.status(201).json({
-      message: "Process data saved successfully",
-      data: newProcess,
+      message: "Process data and items saved successfully",
     });
   } catch (error) {
     console.error("Error saving process data:", error);
@@ -46,9 +82,8 @@ const saveProcessData = async (req, res) => {
     });
   }
 };
-
-
 module.exports = {
   getProcesses,
   saveProcessData,
+ 
 };
