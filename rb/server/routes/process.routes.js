@@ -1,11 +1,14 @@
 
 const express = require("express");
 const router = express.Router();
-const { getProcesses,saveProcessData, } = require("../controllers/process.controller");
+const { getProcesses,getProcessById,createLotProcess } = require("../controllers/process.controller");
 
 
-router.get("/", getProcesses);
-router.post("/save", saveProcessData);
-// router.get("/:id", getProcessById); 
+router.get("/processes", getProcesses);
+
+router.get("/processes/:id", getProcessById);
+
+router.post("/processes", createLotProcess);
+
 
 module.exports = router;
