@@ -96,126 +96,6 @@ function Process() {
     }
   };
 
-// const handleFinish = async () => {
-//   console.log("processData before sending:", processData);
-//   console.log("Steps array:", steps);
-
-//   if (!id) {
-//     console.error("Error: Lot ID is missing!");
-//     toast.error("Lot ID is required.");
-//     return;
-//   }
-
-//   if (!Array.isArray(steps) || steps.length === 0) {
-//     console.error("Error: Steps array is empty or undefined!");
-//     toast.error("Steps data is missing.");
-//     return;
-//   }
-
-//   const processedData = processData.map((process, index) => {
-//     const process_name = steps[index] || null;
-
-//     if (!process_name) {
-//       console.error(`Error: Missing process name at index ${index}`);
-//       toast.error("Some processes are missing names. Please check.");
-//       return null;
-//     }
-
-//     const attributes = [];
-
-//     if (process.beforeWeight) {
-//       attributes.push({
-//         name: "before_weight",
-//         value: Number(process.beforeWeight) || 0,
-//       });
-//     }
-
-//     if (process.afterWeight) {
-//       attributes.push({
-//         name: "after_weight",
-//         value: Number(process.afterWeight) || 0,
-//       });
-//     }
-
-//     if (process.beforeWeight && process.afterWeight) {
-//       attributes.push({
-//         name: "difference",
-//         value: Number(process.beforeWeight) - Number(process.afterWeight),
-//       });
-//     }
-
-//     if (process.item1Name && process.item1Weight) {
-//       attributes.push({ name: "item1_name", value: process.item1Name });
-//       attributes.push({
-//         name: "item1_weight",
-//         value: Number(process.item1Weight),
-//       });
-//     }
-
-//     if (process.item2Name && process.item2Weight) {
-//       attributes.push({ name: "item2_name", value: process.item2Name });
-//       attributes.push({
-//         name: "item2_weight",
-//         value: Number(process.item2Weight),
-//       });
-//     }
-
-//     return {
-//       process_name,
-//       item_type: 
-//         process.itemType?.trim() !== "" ? process.itemType : "Default Type",
-//       attributes,
-//     };
-//   });
-
-//   const validProcessedData = processedData.filter((p) => p !== null);
-
-//   if (validProcessedData.length !== processedData.length) {
-//     console.error(
-//       "Error: Some processes are missing names. Fix them before submitting."
-//     );
-//     return;
-//   }
-
-//   const payload = {
-//     lot_id: Number(id),
-//     processes: validProcessedData,
-//   };
-
-//   console.log(
-//     "Final processed data to send:",
-//     JSON.stringify(payload, null, 2)
-//   );
-
-//   try {
-//     const response = await fetch(
-//       "http://localhost:5000/api/process/processes",
-//       {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//           Accept: "application/json",
-//         },
-//         body: JSON.stringify(payload),
-//       }
-//     );
-
-//     if (!response.ok) {
-//       const errorText = await response.text();
-//       console.error("Backend Error Response:", errorText);
-//       throw new Error(
-//         `HTTP error! Status: ${response.status}, Message: ${errorText}`
-//       );
-//     }
-
-//     const data = await response.json();
-//     console.log("Response from backend:", data);
-//     toast.success("All processes saved successfully!");
-//   } catch (error) {
-//     console.error("Error:", error);
-//     toast.error("Failed to save processes. Please try again.");
-//   }
-// };
 
 const handleFinish = async () => {
   console.log(
@@ -345,6 +225,7 @@ const handleFinish = async () => {
     toast.error("Failed to save processes. Please try again.");
   }
 };
+
 
 const handleBack = () => {
     setActiveStep(activeStep - 1);
@@ -513,6 +394,7 @@ const handleBack = () => {
 
             <Button
               variant="outlined"
+
               onClick={handleBack}
               disabled={activeStep === 0}
               style={{ marginTop: "10px" }}

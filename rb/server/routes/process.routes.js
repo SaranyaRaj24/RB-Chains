@@ -8,7 +8,7 @@ router.get("/processes", getProcesses);
 
 router.get("/processes/:id", getProcessById);
 
-router.post("/processes", createLotProcess);
+// router.post("/processes", createLotProcess);
 
 
 module.exports = router;
