@@ -93,14 +93,15 @@ model AttributeValue {
   id              Int         @id @default(autoincrement())
   lot_id          Int
   process_id      Int
-  items_id        Int         
+  items_id        Int?         
   value           Float
 
   LotInfo         LotInfo     @relation(fields: [lot_id], references: [id])
   LotProcess      LotProcess  @relation(fields: [process_id], references: [id])
 
-  Item            Item        @relation(fields: [items_id], references: [item_id]) 
-  attribute       AttributeInfo[] 
+ Item Item? @relation(fields: [items_id], references: [item_id])  
+
+  AttributeInfo   AttributeInfo[]
   @@map("attributeValue")
 }
 
