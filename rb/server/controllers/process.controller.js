@@ -234,6 +234,6 @@ const getProcessById = async (req, res) => {
 module.exports = {
   getProcesses,
   getProcessById,
-  createLotProcess
+  
 
 };

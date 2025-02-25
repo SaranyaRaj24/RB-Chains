@@ -134,10 +134,14 @@ function Customer() {
     }
   };
 
-  const handleView = (customer) => {
-    navigate(`/transaction/${customer.name}`, { state: { customer } });
-  };
-
+  // const handleView = (customer) => {
+  //   navigate(`/transaction/${customer.customer_name}`, { state: { customer } });
+  // };
+const handleView = (customer) => {
+  // Encode the customer name to handle spaces and special characters
+  const encodedCustomerName = encodeURIComponent(customer.customer_name);
+  navigate(`/transaction/${encodedCustomerName}`, { state: { customer } });
+};
 
   const filteredCustomers = customers.filter((cust) =>
     cust.customer_name.toLowerCase().includes(searchQuery.toLowerCase())
