@@ -24,23 +24,23 @@ import { Add, Search } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
 
 const initialTransactions = [
-  { date: "01-02-2024", description: "Bracelet", amount: 500, status: "Paid" },
+  { date: "01-02-2024", description: "Bracelet", gram: 500, status: "Paid" },
   {
     date: "05-02-2024",
     description: "Chain",
-    amount: 200,
+    Gram: 200,
     status: "Paid",
   },
   {
     date: "10-02-2024",
     description: "Bangle",
-    amount: 1000,
+    Gram: 1000,
     status: "Pending",
   },
 ];
 
 function Transaction() {
-  const { name } = useParams();
+  const {customerName} = useParams();
   const [transactions, setTransactions] = useState(initialTransactions);
   const [searchDate, setSearchDate] = useState("");
   const [open, setOpen] = useState(false);
@@ -61,7 +61,7 @@ function Transaction() {
       setTransactions(initialTransactions);
     }
   };
-
+  const decodedCustomerName = decodeURIComponent(customerName);
   const handleAddTransaction = () => {
     setOpen(true);
   };
@@ -73,7 +73,7 @@ function Transaction() {
   const handleSave = () => {
     setTransactions([...transactions, newTransaction]);
     setOpen(false);
-    setNewTransaction({ date: "", description: "", amount: "", status: "" });
+    setNewTransaction({ date: "", description: "", Gram: "", status: "" });
   };
 
   const totalAmount = transactions.reduce((sum, txn) => sum + txn.amount, 0);
@@ -87,15 +87,13 @@ function Transaction() {
 
   return (
     <div style={{ padding: 20 }}>
-
       <Typography variant="h4" style={{ marginBottom: 20, fontWeight: "bold" }}>
-        Transactions for {name}
+        Transactions for {decodedCustomerName}
       </Typography>
 
-     
       <Grid container spacing={3}>
         <Grid item xs={12} md={4}>
-          <Card style={{ backgroundColor: "#d4af37", color: "#000" }}>
+          <Card style={{ backgroundColor: "aliceblue", color: "#000" }}>
             <CardContent>
               <Typography variant="h6">Total Transactions</Typography>
               <Typography variant="h4" style={{ fontWeight: "bold" }}>
@@ -106,7 +104,7 @@ function Transaction() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Card style={{ backgroundColor: "#333", color: "#fff" }}>
+          <Card style={{ backgroundColor: "aliceblue", color: "black" }}>
             <CardContent>
               <Typography variant="h6">Outstanding Balance</Typography>
               <Typography variant="h4" style={{ fontWeight: "bold" }}>
@@ -117,7 +115,7 @@ function Transaction() {
         </Grid>
 
         <Grid item xs={12} md={4}>
-          <Card style={{ backgroundColor: "#444", color: "#fff" }}>
+          <Card style={{ backgroundColor: "aliceblue", color: "black" }}>
             <CardContent>
               <Typography variant="h6">Last Transaction</Typography>
               <Typography variant="h4" style={{ fontWeight: "bold" }}>
@@ -127,7 +125,6 @@ function Transaction() {
           </Card>
         </Grid>
       </Grid>
-
 
       <div style={{ marginTop: 30, display: "flex", alignItems: "center" }}>
         <TextField
@@ -148,14 +145,13 @@ function Transaction() {
         </Button>
       </div>
 
-    
       <TableContainer component={Paper} style={{ marginTop: 20 }}>
         <Table>
           <TableHead>
-            <TableRow style={{ backgroundColor: "#d4af37" }}>
+            <TableRow style={{ backgroundColor: "#f5f5f5" }}>
               <TableCell>Date</TableCell>
               <TableCell>Description</TableCell>
-              <TableCell>Amount (₹)</TableCell>
+              <TableCell>Gram </TableCell>
               <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -163,17 +159,13 @@ function Transaction() {
             {transactions.map((txn, index) => (
               <TableRow
                 key={index}
-                style={
-                  index % 2 === 0
-                    ? { backgroundColor: "#333", color: "#fff" }
-                    : { backgroundColor: "#444", color: "#fff" }
-                }
+                style={{
+                  backgroundColor: index % 2 === 0 ? "#ffffff" : "#f9f9f9",
+                }}
               >
-                <TableCell style={{ color: "#fff" }}>{txn.date}</TableCell>
-                <TableCell style={{ color: "#fff" }}>
-                  {txn.description}
-                </TableCell>
-                <TableCell style={{ color: txn.amount < 0 ? "red" : "#fff" }}>
+                <TableCell>{txn.date}</TableCell>
+                <TableCell>{txn.description}</TableCell>
+                <TableCell style={{ color: txn.amount < 0 ? "red" : "#000" }}>
                   {txn.amount}
                 </TableCell>
                 <TableCell
@@ -183,7 +175,7 @@ function Transaction() {
                         ? "orange"
                         : txn.status === "Refunded"
                         ? "red"
-                        : "lightgreen",
+                        : "green",
                   }}
                 >
                   {txn.status}
@@ -194,7 +186,6 @@ function Transaction() {
         </Table>
       </TableContainer>
 
-     
       <IconButton
         style={{
           position: "fixed",
@@ -209,7 +200,6 @@ function Transaction() {
         <Add />
       </IconButton>
 
- 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Add New Transaction</DialogTitle>
         <DialogContent>
@@ -275,3 +265,6 @@ function Transaction() {
 }
 
 export default Transaction;
+
+
+

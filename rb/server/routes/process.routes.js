@@ -1,7 +1,7 @@
 
 const express = require("express");
 const router = express.Router();
-const { getProcesses,getProcessById,createLotProcess } = require("../controllers/process.controller");
+const { getProcesses,getProcessById } = require("../controllers/process.controller");
 
 
 router.get("/processes", getProcesses);

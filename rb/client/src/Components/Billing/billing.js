@@ -10,7 +10,7 @@ const Billing = () => {
   const [customers, setCustomers] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [billItems, setBillItems] = useState([]); 
+  const [billItems, setBillItems] = useState([]);
   const [billNo, setBillNo] = useState("001");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -18,10 +18,14 @@ const Billing = () => {
   const billRef = useRef();
 
   const products = [
-    { id: "P001", name: "Gold Ring" },
-    { id: "P002", name: "Silver Necklace" },
-    { id: "P003", name: "Diamond Earrings" },
-    { id: "P004", name: "Platinum Bracelet" },
+    { id: "P001", name: "Gold Ring", touch: 92, weight: 6.64, pure: 6.19 },
+    {
+      id: "P002",
+      name: "Silver Necklace",
+      touch: 92,
+      weight: 11.34,
+      pure: 10.66,
+    },
   ];
 
   useEffect(() => {
@@ -63,7 +67,7 @@ const Billing = () => {
 
   const handleProductSelect = (event, newValue) => {
     if (newValue && !billItems.some((item) => item.id === newValue.id)) {
-      setBillItems((prevItems) => [...prevItems, newValue]); 
+      setBillItems((prevItems) => [...prevItems, newValue]);
     }
   };
 
@@ -85,6 +89,19 @@ const Billing = () => {
     }, 0);
   };
 
+  const calculateTotal = () => {
+    return billItems.reduce((total, item) => total + item.pure, 0).toFixed(3);
+  };
+
+  const calculateLess = (total) => {
+    const lessValue = (total * 0.9992).toFixed(3);
+    return lessValue;
+  };
+
+  const calculateClosing = (total, less) => {
+    return (total - less).toFixed(3);
+  };
+
   return (
     <Box sx={styles.container} ref={billRef}>
       <h1 style={styles.heading}>Estimate Only</h1>
@@ -94,7 +111,8 @@ const Billing = () => {
           <strong>Bill No:</strong> {billNo}
         </p>
         <p>
-          <strong>Date:</strong> {date} <br /><br></br>
+          <strong>Date:</strong> {date} <br />
+          <br></br>
           <strong>Time:</strong> {time}
         </p>
       </Box>
@@ -174,9 +192,9 @@ const Billing = () => {
               billItems.map((item, index) => (
                 <tr key={index}>
                   <td style={styles.td}>{item.name}</td>
-                  <td style={styles.td}>2</td>
-                  <td style={styles.td}>10</td>
-                  <td style={styles.td}>20</td>
+                  <td style={styles.td}>{item.touch}</td>
+                  <td style={styles.td}>{item.weight}</td>
+                  <td style={styles.td}>{item.pure}</td>
                 </tr>
               ))
             ) : (
@@ -189,6 +207,35 @@ const Billing = () => {
                 </td>
               </tr>
             )}
+            <tr>
+              <td colSpan="3" style={styles.td}>
+                <strong>Total</strong>
+              </td>
+              <td style={styles.td}>{calculateTotal()}</td>
+            </tr>
+            <tr>
+              <td colSpan="3" style={styles.td}>
+                <strong>Less: {calculateTotal()} X 99.92%</strong>
+              </td>
+              <td style={styles.td}>{calculateLess(calculateTotal())}</td>
+            </tr>
+            <tr>
+              <td colSpan="3" style={styles.td}>
+                <strong>Less: {calculateTotal()} X 99.92%</strong>
+              </td>
+              <td style={styles.td}>{calculateLess(calculateTotal())}</td>
+            </tr>
+            <tr>
+              <td colSpan="3" style={styles.td}>
+                <strong>Closing</strong>
+              </td>
+              <td style={styles.td}>
+                {calculateClosing(
+                  calculateTotal(),
+                  calculateLess(calculateTotal())
+                )}
+              </td>
+            </tr>
           </tbody>
         </table>
       </Box>
@@ -248,3 +295,7 @@ const styles = {
 };
 
 export default Billing;
+
+
+
+

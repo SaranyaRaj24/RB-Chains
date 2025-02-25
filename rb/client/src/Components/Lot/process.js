@@ -1,418 +1,600 @@
 
+// import React, { useState } from "react";
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableContainer,
+//   TableHead,
+//   TableRow,
+//   Paper,
+//   TextField,
+//   Button,
+//   Box,
+// } from "@mui/material";
+// import { styled } from "@mui/material/styles";
+
+// const processes = [
+//   "Melting",
+//   "Kambi",
+//   "Wire",
+//   "Machine",
+//   "Soldrine",
+//   "Joint",
+//   "Cutting",
+//   "Finishing",
+// ];
+
+// const StyledTableCell = styled(TableCell)({
+//   border: "1px solid #ccc",
+//   textAlign: "center",
+//   padding: "8px",
+// });
+
+// const StyledTableContainer = styled(TableContainer)({
+//   margin: "20px auto",
+//   maxWidth: "100%",
+//   border: "1px solid #ccc",
+// });
+
+// const StyledInput = styled(TextField)({
+//   "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+//   "& .MuiInputBase-input": {
+//     textAlign: "center",
+//     padding: "5px",
+//   },
+//   width: "80px",
+// });
+
+// const ProcessTable = () => {
+//   const [items, setItems] = useState([
+//     { id: 1, touch: "", itemName: "", data: {} },
+//   ]);
+
+
+//   const handleWeightChange = (index, process, field, value) => {
+//     const updatedItems = [...items];
+
+//     if (!updatedItems[index].data[process]) {
+//       updatedItems[index].data[process] = { beforeWeight: "", afterWeight: "" };
+//     }
+//     updatedItems[index].data[process][field] = value;
+
+ 
+//     if (field === "afterWeight") {
+//       const nextProcessIndex = processes.indexOf(process) + 1;
+//       if (nextProcessIndex < processes.length) {
+//         const nextProcess = processes[nextProcessIndex];
+//         updatedItems[index].data[nextProcess] = {
+//           ...updatedItems[index].data[nextProcess],
+//           beforeWeight: value, 
+//         };
+//       }
+//     }
+
+//     setItems(updatedItems);
+//   };
+
+  
+//   const handleTouchChange = (index, value) => {
+//     const updatedItems = [...items];
+//     updatedItems[index].touch = value;
+
+//     updatedItems[index].data["Melting"] = {
+//       ...updatedItems[index].data["Melting"],
+//       beforeWeight: value,
+//     };
+
+//     setItems(updatedItems);
+//   };
+
+
+//   const addRow = () => {
+//     setItems([
+//       ...items,
+//       { id: items.length + 1, touch: "", itemName: "", data: {} },
+//     ]);
+//   };
+
+//   return (
+//     <Box sx={{ padding: "20px", textAlign: "right" }}>
+
+//       <Button
+//         variant="contained"
+//         color="primary"
+//         onClick={addRow}
+//         sx={{ marginBottom: "10px" }}
+//       >
+//         Add Row
+//       </Button>
+
+//       <StyledTableContainer component={Paper}>
+//         <Table>
+//           <TableHead>
+//             <TableRow>
+//               <StyledTableCell rowSpan={2}>
+//                 <b>Raw Gold</b>
+//               </StyledTableCell>
+//               <StyledTableCell rowSpan={2}>
+//                 <b>Item Name</b>
+//               </StyledTableCell>
+//               {processes.map((process) => (
+//                 <StyledTableCell key={process} colSpan={3}>
+//                   <b>{process}</b>
+//                 </StyledTableCell>
+//               ))}
+//             </TableRow>
+//             <TableRow>
+//               {processes.map(() => (
+//                 <>
+//                   <StyledTableCell>
+//                     <b>Before</b>
+//                   </StyledTableCell>
+//                   <StyledTableCell>
+//                     <b>After</b>
+//                   </StyledTableCell>
+//                   <StyledTableCell>
+//                     <b>Diff</b>
+//                   </StyledTableCell>
+//                 </>
+//               ))}
+//             </TableRow>
+//           </TableHead>
+//           <TableBody>
+//             {items.map((item, index) => (
+//               <TableRow key={item.id}>
+//                 <StyledTableCell>
+//                   <StyledInput
+//                     variant="outlined"
+//                     size="small"
+//                     value={item.touch}
+//                     onChange={(e) => handleTouchChange(index, e.target.value)}
+//                   />
+//                 </StyledTableCell>
+//                 <StyledTableCell>
+//                   <StyledInput
+//                     variant="outlined"
+//                     size="small"
+//                     value={item.itemName}
+//                     onChange={(e) => {
+//                       const updatedItems = [...items];
+//                       updatedItems[index].itemName = e.target.value;
+//                       setItems(updatedItems);
+//                     }}
+//                   />
+//                 </StyledTableCell>
+//                 {processes.map((process) => {
+//                   const beforeWeight = item.data[process]?.beforeWeight || "";
+//                   const afterWeight = item.data[process]?.afterWeight || "";
+//                   const difference =
+//                     beforeWeight && afterWeight
+//                       ? (
+//                           parseFloat(beforeWeight) - parseFloat(afterWeight)
+//                         ).toFixed(2)
+//                       : "-";
+
+//                   return (
+//                     <React.Fragment key={process}>
+//                       <StyledTableCell>
+//                         <StyledInput
+//                           type="number"
+//                           variant="outlined"
+//                           size="small"
+//                           value={beforeWeight}
+//                           InputProps={{ readOnly: true }} 
+//                         />
+//                       </StyledTableCell>
+//                       <StyledTableCell>
+//                         <StyledInput
+//                           type="number"
+//                           variant="outlined"
+//                           size="small"
+//                           value={afterWeight}
+//                           onChange={(e) =>
+//                             handleWeightChange(
+//                               index,
+//                               process,
+//                               "afterWeight",
+//                               e.target.value
+//                             )
+//                           }
+//                         />
+//                       </StyledTableCell>
+//                       <StyledTableCell>
+//                         <b>{difference}</b>
+//                       </StyledTableCell>
+//                     </React.Fragment>
+//                   );
+//                 })}
+//               </TableRow>
+//             ))}
+//           </TableBody>
+//         </Table>
+//       </StyledTableContainer>
+//     </Box>
+//   );
+// };
+
+// export default ProcessTable;
+
+
+
 import React, { useState } from "react";
 import {
-  Stepper,
-  Step,
-  StepLabel,
-  Button,
-  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   TextField,
-  Grid,
+  Button,
+  Box,
 } from "@mui/material";
-import { useParams } from "react-router-dom";
-import {  toast ,ToastContainer} from "react-toastify";
+import { styled } from "@mui/material/styles";
 
+const processes = ["Wire", "Machine", "Soldrine", "Cutting", "Finishing"];
 
-function Process() {
-  const { id  } = useParams();
-  const [activeStep, setActiveStep] = useState(0);
+const StyledTableCell = styled(TableCell)({
+  border: "1px solid #ccc",
+  textAlign: "center",
+  padding: "8px",
+});
 
-  const [processData, setProcessData] = useState([
-    { beforeWeight: "", afterWeight: "", difference: null },
-    { beforeWeight: "", afterWeight: "", difference: null },
-    { beforeWeight: "", afterWeight: "", difference: null },
-    {
-      beforeWeight: "",
-      afterWeight: "",
-      difference: null,
-      item1Name: "",
-      item1Weight: "",
-      item2Name: "",
-      item2Weight: "",
-    },
-    { beforeWeight: "", afterWeight: "", difference: null },
-    { beforeWeight: "", afterWeight: "", difference: null },
-    { beforeWeight: "", afterWeight: "", difference: null },
-    { beforeWeight: "", afterWeight: "", difference: null },
+const StyledTableContainer = styled(TableContainer)({
+  margin: "20px auto",
+  maxWidth: "80%",
+  border: "1px solid #ccc",
+});
+
+const StyledInput = styled(TextField)({
+  "& .MuiOutlinedInput-notchedOutline": { border: "none" },
+  "& .MuiInputBase-input": {
+    textAlign: "center",
+    padding: "5px",
+  },
+  width: "40px",
+});
+
+const ProcessTable = () => {
+  const [items, setItems] = useState([
+    { id: 1, touch: "", itemName: "", kambiWeight: "", data: {} },
   ]);
 
-  const steps = [
-    "Scrap Gold",
-    "Melting Process",
-    "Kambi Process",
-    "Initial Item Weight",
-    "Kambi Process 2",
-    "Machine Process 1",
-    "Machine Process 2",
-    "Color Process",
-  ];
-
-  const handleNext = () => {
-    if (activeStep === steps.length - 1) {
-      handleFinish();
-    } else {
-      if (activeStep === 0 && processData[0].beforeWeight === "") {
-        alert("Please enter the gold weight.");
-        return;
-      }
-      if (
-        activeStep === 1 &&
-        (processData[1].beforeWeight === "" ||
-          processData[1].afterWeight === "")
-      ) {
-        alert("Please enter both before and after weight.");
-        return;
-      }
-
-      const updatedData = [...processData];
-      if (activeStep > 0 && activeStep !== 3) {
-        const before = parseFloat(updatedData[activeStep].beforeWeight) || 0;
-        const after = parseFloat(updatedData[activeStep].afterWeight) || 0;
-        updatedData[activeStep].difference = before - after;
-      }
-
-      if (activeStep === 3) {
-        const totalWeight = parseFloat(updatedData[3].beforeWeight) || 0;
-        const item1Weight = parseFloat(updatedData[3].item1Weight) || 0;
-        const item2Weight = parseFloat(updatedData[3].item2Weight) || 0;
-
-        if (item1Weight + item2Weight !== totalWeight) {
-          alert("The sum of item weights must equal the total weight.");
-          return;
-        }
-
-        updatedData[4].beforeWeight = item1Weight;
-        updatedData[5].beforeWeight = item2Weight;
-      }
-
-      if (activeStep < steps.length - 1 && activeStep !== 3) {
-        updatedData[activeStep + 1].beforeWeight =
-          updatedData[activeStep].afterWeight ||
-          updatedData[activeStep].beforeWeight;
-      }
-
-      setProcessData(updatedData);
-      setActiveStep(activeStep + 1);
+  const handleWeightChange = (index, process, field, value) => {
+    const updatedItems = [...items];
+    if (!updatedItems[index].data[process]) {
+      updatedItems[index].data[process] = { beforeWeight: "", afterWeight: "" };
     }
+    updatedItems[index].data[process][field] = value;
+    if (field === "afterWeight") {
+      const nextProcessIndex = processes.indexOf(process) + 1;
+      if (nextProcessIndex < processes.length) {
+        const nextProcess = processes[nextProcessIndex];
+        updatedItems[index].data[nextProcess] = {
+          ...updatedItems[index].data[nextProcess],
+          beforeWeight: value,
+        };
+      }
+    }
+    setItems(updatedItems);
   };
 
-
-const handleFinish = async () => {
-  console.log(
-    "processData before sending:",
-    JSON.stringify(processData, null, 2)
-  );
-  console.log("Steps array:", JSON.stringify(steps, null, 2));
-
-  if (!id) {
-    console.error("Error: Lot ID is missing!");
-    toast.error("Lot ID is required.");
-    return;
-  }
-
-  if (!Array.isArray(steps) || steps.length === 0) {
-    console.error("Error: Steps array is empty or undefined!");
-    toast.error("Steps data is missing.");
-    return;
-  }
-
-  const processedData = processData.map((process, index) => {
-    const process_name = steps[index] || null;
-
-    if (!process_name) {
-      console.error(`Error: Missing process name at index ${index}`);
-      toast.error("Some processes are missing names. Please check.");
-      return null;
-    }
-
-    const attributes = [];
-
-    if (process.beforeWeight !== undefined) {
-      attributes.push({
-        name: "before_weight",
-        value: Number(process.beforeWeight) || 0,
-      });
-    }
-
-    if (process.afterWeight !== undefined) {
-      attributes.push({
-        name: "after_weight",
-        value: Number(process.afterWeight) || 0,
-      });
-    }
-
-    if (
-      process.beforeWeight !== undefined &&
-      process.afterWeight !== undefined
-    ) {
-      attributes.push({
-        name: "difference",
-        value: Number(process.beforeWeight) - Number(process.afterWeight),
-      });
-    }
-
-    if (process.item1Name && process.item1Weight !== undefined) {
-      attributes.push({ name: "item1_name", value: process.item1Name });
-      attributes.push({
-        name: "item1_weight",
-        value: Number(process.item1Weight),
-      });
-    }
-
-    if (process.item2Name && process.item2Weight !== undefined) {
-      attributes.push({ name: "item2_name", value: process.item2Name });
-      attributes.push({
-        name: "item2_weight",
-        value: Number(process.item2Weight),
-      });
-    }
-
-    console.log(`Processed attributes for process ${index}:`, attributes);
-
-    return {
-      process_name,
-      item_type:
-        process.itemType?.trim() !== "" ? process.itemType : "Default Type",
-      attributes,
+  const handleKambiWeightChange = (index, value) => {
+    const updatedItems = [...items];
+    updatedItems[index].kambiWeight = value;
+    updatedItems[index].data["Kambi"] = {
+      ...updatedItems[index].data["Kambi"],
+      beforeWeight: value,
     };
-  });
-
-  const validProcessedData = processedData.filter((p) => p !== null);
-
-  if (validProcessedData.length !== processedData.length) {
-    console.error(
-      "Error: Some processes are missing names. Fix them before submitting."
-    );
-    return;
-  }
-
-  const payload = {
-    lot_id: Number(id),
-    processes: validProcessedData,
+    setItems(updatedItems);
   };
 
-  console.log(
-    "Final Payload before sending:",
-    JSON.stringify(payload, null, 2)
-  );
-
-  try {
-    const response = await fetch(
-      "http://localhost:5000/api/process/processes",
+  const addRow = () => {
+    setItems([
+      ...items,
       {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Backend Error Response:", errorText);
-      throw new Error(
-        `HTTP error! Status: ${response.status}, Message: ${errorText}`
-      );
-    }
-
-    const data = await response.json();
-    console.log("Response from backend:", data);
-    toast.success("All processes saved successfully!");
-  } catch (error) {
-    console.error("Error:", error);
-    toast.error("Failed to save processes. Please try again.");
-  }
-};
-
-
-const handleBack = () => {
-    setActiveStep(activeStep - 1);
-  };
-
-  const handleWeightChange = (e, processIndex, weightType) => {
-    const value = e.target.value;
-    const updatedData = [...processData];
-    updatedData[processIndex][weightType] = value;
-    setProcessData(updatedData);
+        id: items.length + 1,
+        touch: "",
+        itemName: "",
+        kambiWeight: "",
+        data: {},
+      },
+    ]);
   };
 
   return (
-    <div>
-      <Stepper activeStep={activeStep} alternativeLabel>
-        {steps.map((label, index) => (
-          <Step key={index}>
-            <StepLabel>{label}</StepLabel>
-          </Step>
-        ))}
-      </Stepper>
+    <Box sx={{ padding: "20px", textAlign: "right" }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={addRow}
+        sx={{ marginBottom: "10px" }}
+      >
+        Add Row
+      </Button>
 
-      <div style={{ marginTop: "20px" }}>
-        {activeStep === steps.length ? (
-          <Typography variant="h6">All Processes Completed</Typography>
-        ) : (
-          <div>
-            <Typography variant="h6">{steps[activeStep]}</Typography>
+      <StyledTableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>
+                <b>Touch</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Item Type</b>
+              </StyledTableCell>
+              <StyledTableCell colSpan={3}>
+                <b>Melting Process</b>
+              </StyledTableCell>
+              <StyledTableCell colSpan={3}>
+                <b>Kambi Process</b>
+              </StyledTableCell>
+              <StyledTableCell colSpan={2}>
+                <b>Item Details</b>
+              </StyledTableCell>
+            </TableRow>
+            <TableRow>
+              <StyledTableCell></StyledTableCell>
+              <StyledTableCell></StyledTableCell>
+              <StyledTableCell>
+                <b>Before</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>After</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Diff</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Before</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>After</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Diff</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Item Name</b>
+              </StyledTableCell>
+              <StyledTableCell>
+                <b>Item Weight</b>
+              </StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item, index) => (
+              <TableRow key={item.id}>
+                <StyledTableCell>
+                  <StyledInput
+                    type="number"
+                    variant="outlined"
+                    size="small"
+                    value={item.touch}
+                    onChange={(e) => {
+                      const updatedItems = [...items];
+                      updatedItems[index].touch = e.target.value;
+                      setItems(updatedItems);
+                    }}
+                  />
+                </StyledTableCell>
+                <StyledTableCell>
+                  <StyledInput
+                    variant="outlined"
+                    size="small"
+                    value={item.itemName}
+                    onChange={(e) => {
+                      const updatedItems = [...items];
+                      updatedItems[index].itemName = e.target.value;
+                      setItems(updatedItems);
+                    }}
+                  />
+                </StyledTableCell>
+                {(() => {
+                  const meltingBeforeWeight =
+                    item.data["Melting"]?.beforeWeight || "";
+                  const meltingAfterWeight =
+                    item.data["Melting"]?.afterWeight || "";
+                  const meltingDifference =
+                    meltingBeforeWeight && meltingAfterWeight
+                      ? (
+                          parseFloat(meltingBeforeWeight) -
+                          parseFloat(meltingAfterWeight)
+                        ).toFixed(2)
+                      : "-";
+                  return (
+                    <>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={meltingBeforeWeight}
+                          onChange={(e) =>
+                            handleWeightChange(
+                              index,
+                              "Melting",
+                              "beforeWeight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={meltingAfterWeight}
+                          onChange={(e) =>
+                            handleWeightChange(
+                              index,
+                              "Melting",
+                              "afterWeight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <b>{meltingDifference}</b>
+                      </StyledTableCell>
+                    </>
+                  );
+                })()}
+                {(() => {
+                  const kambiBeforeWeight =
+                    item.data["Kambi"]?.beforeWeight || "";
+                  const kambiAfterWeight =
+                    item.data["Kambi"]?.afterWeight || "";
+                  const kambiDifference =
+                    kambiBeforeWeight && kambiAfterWeight
+                      ? (
+                          parseFloat(kambiBeforeWeight) -
+                          parseFloat(kambiAfterWeight)
+                        ).toFixed(2)
+                      : "-";
+                  return (
+                    <>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={kambiBeforeWeight}
+                          InputProps={{ readOnly: true }}
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={kambiAfterWeight}
+                          onChange={(e) =>
+                            handleWeightChange(
+                              index,
+                              "Kambi",
+                              "afterWeight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <b>{kambiDifference}</b>
+                      </StyledTableCell>
+                    </>
+                  );
+                })()}
+                <StyledTableCell>
+                  <StyledInput
+                    variant="outlined"
+                    size="small"
+                    value={item.itemName}
+                    onChange={(e) => {
+                      const updatedItems = [...items];
+                      updatedItems[index].itemName = e.target.value;
+                      setItems(updatedItems);
+                    }}
+                  />
+                </StyledTableCell>
+                <StyledTableCell>
+                  <StyledInput
+                    variant="outlined"
+                    size="small"
+                    value={item.kambiWeight}
+                    readOnly
+                  />
+                </StyledTableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </StyledTableContainer>
 
-            {activeStep === 0 && (
-              <TextField
-                label="Enter Gold Weight"
-                value={processData[0].beforeWeight}
-                onChange={(e) => handleWeightChange(e, 0, "beforeWeight")}
-                fullWidth
-                margin="normal"
-                type="number"
-                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              />
-            )}
-
-            {activeStep > 0 && activeStep < 3 && (
-              <div>
-                <TextField
-                  label="Enter Before Weight"
-                  value={processData[activeStep].beforeWeight}
-                  onChange={(e) =>
-                    handleWeightChange(e, activeStep, "beforeWeight")
-                  }
-                  fullWidth
-                  margin="normal"
-                  type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                />
-                <TextField
-                  label="Enter After Weight"
-                  value={processData[activeStep].afterWeight}
-                  onChange={(e) =>
-                    handleWeightChange(e, activeStep, "afterWeight")
-                  }
-                  fullWidth
-                  margin="normal"
-                  type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                />
-                {processData[activeStep].difference !== null && (
-                  <Typography variant="body1">
-                    Weight Difference: {processData[activeStep].difference}
-                  </Typography>
-                )}
-              </div>
-            )}
-
-            {activeStep === 3 && (
-              <div>
-                <TextField
-                  label="Enter Initial Item Weight"
-                  value={processData[3].beforeWeight}
-                  onChange={(e) => handleWeightChange(e, 3, "beforeWeight")}
-                  fullWidth
-                  margin="normal"
-                  type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                />
-                <Grid container spacing={2} style={{ marginTop: "10px" }}>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Item 1 Name"
-                      value={processData[3].item1Name}
-                      onChange={(e) => handleWeightChange(e, 3, "item1Name")}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Item 1 Weight"
-                      value={processData[3].item1Weight}
-                      onChange={(e) => handleWeightChange(e, 3, "item1Weight")}
-                      fullWidth
-                      type="number"
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Item 2 Name"
-                      value={processData[3].item2Name}
-                      onChange={(e) => handleWeightChange(e, 3, "item2Name")}
-                      fullWidth
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Item 2 Weight"
-                      value={processData[3].item2Weight}
-                      onChange={(e) => handleWeightChange(e, 3, "item2Weight")}
-                      fullWidth
-                      type="number"
-                      inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                    />
-                  </Grid>
-                </Grid>
-              </div>
-            )}
-
-            {activeStep > 3 && activeStep < steps.length && (
-              <div>
-                <TextField
-                  label="Enter Before Weight"
-                  value={processData[activeStep].beforeWeight}
-                  onChange={(e) =>
-                    handleWeightChange(e, activeStep, "beforeWeight")
-                  }
-                  fullWidth
-                  margin="normal"
-                  type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                />
-                <TextField
-                  label="Enter After Weight"
-                  value={processData[activeStep].afterWeight}
-                  onChange={(e) =>
-                    handleWeightChange(e, activeStep, "afterWeight")
-                  }
-                  fullWidth
-                  margin="normal"
-                  type="number"
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                />
-                {processData[activeStep].difference !== null && (
-                  <Typography variant="body1">
-                    Weight Difference: {processData[activeStep].difference}
-                  </Typography>
-                )}
-              </div>
-            )}
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleNext}
-              style={{ marginTop: "10px", marginRight: "10px" }}
-            >
-              {activeStep === steps.length - 1 ? "Finish" : "Next"}
-            </Button>
-
-            <Button
-              variant="outlined"
-
-              onClick={handleBack}
-              disabled={activeStep === 0}
-              style={{ marginTop: "10px" }}
-            >
-              Back
-            </Button>
-            <ToastContainer
-              position="top-right"
-              autoClose={3000}
-              style={{ marginTop: "60px" }}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+      <StyledTableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              {processes.map((process) => (
+                <StyledTableCell key={process} colSpan={3}>
+                  <b>{process}</b>
+                </StyledTableCell>
+              ))}
+            </TableRow>
+            <TableRow>
+              {processes.map(() => (
+                <>
+                  <StyledTableCell>
+                    <b>Before</b>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <b>After</b>
+                  </StyledTableCell>
+                  <StyledTableCell>
+                    <b>Diff</b>
+                  </StyledTableCell>
+                </>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item, index) => (
+              <TableRow key={item.id}>
+                {processes.map((process) => {
+                  const beforeWeight = item.data[process]?.beforeWeight || "";
+                  const afterWeight = item.data[process]?.afterWeight || "";
+                  const difference =
+                    beforeWeight && afterWeight
+                      ? (
+                          parseFloat(beforeWeight) - parseFloat(afterWeight)
+                        ).toFixed(2)
+                      : "-";
+                  return (
+                    <React.Fragment key={process}>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={beforeWeight}
+                          InputProps={{ readOnly: true }}
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <StyledInput
+                          type="number"
+                          variant="outlined"
+                          size="small"
+                          value={afterWeight}
+                          onChange={(e) =>
+                            handleWeightChange(
+                              index,
+                              process,
+                              "afterWeight",
+                              e.target.value
+                            )
+                          }
+                        />
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <b>{difference}</b>
+                      </StyledTableCell>
+                    </React.Fragment>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </StyledTableContainer>
+    </Box>
   );
-}
+};
 
-export default Process;
+export default ProcessTable;
 
 

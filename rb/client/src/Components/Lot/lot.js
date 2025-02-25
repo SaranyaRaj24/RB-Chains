@@ -24,6 +24,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { REACT_APP_BACKEND_SERVER_URL } from "../../config/config";
+import ProcessStepper from "./process";
 
 
 
@@ -248,7 +249,7 @@ const handleViewLot = (id, lotName) => {
             ),
           }}
         />
-
+     
         <Button
           style={{
             backgroundColor: "#d4af37",
@@ -274,7 +275,7 @@ const handleViewLot = (id, lotName) => {
                 Lot Name
               </TableCell>
               <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
-                Before Weight
+                Scrap Gold Weight
               </TableCell>
               <TableCell style={{ fontWeight: "bold", fontSize: "1rem" }}>
                 After Weight
@@ -348,7 +349,7 @@ const handleViewLot = (id, lotName) => {
           />
           <TextField
             margin="dense"
-            label="Before Weight"
+            label="Scrap Gold Weight"
             name="lot_before_weight"
             type="number"
             value={newLot.lot_before_weight}
