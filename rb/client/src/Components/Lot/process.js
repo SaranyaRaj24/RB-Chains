@@ -82,11 +82,23 @@ const ProcessTable = () => {
     ]);
   };
 
-  const handleAddItemColumns = (index) => {
-    const updatedItems = [...items];
-    updatedItems[index].kambiNotes.push({ name: "", weight: "" });
-    setItems(updatedItems);
-  };
+  // const handleAddItemColumns = (index) => {
+  //   const updatedItems = [...items];
+  //   updatedItems[index].kambiNotes.push({ name: "", weight: "" });
+  //   setItems(updatedItems);
+  // };
+const handleAddItemColumns = (index) => {
+  const updatedItems = [...items];
+  updatedItems[index].kambiNotes.push({
+    name: "",
+    weight: "",
+    data: processes.reduce((acc, process) => {
+      acc[process] = { beforeWeight: "", afterWeight: "" };
+      return acc;
+    }, {})
+  });
+  setItems(updatedItems);
+};
 
   const handleCreateLot = () => {
     setOpen(true);
@@ -113,6 +125,8 @@ const ProcessTable = () => {
       }, 0)
       .toFixed(2);
   };
+console.log("Processes:", processes);
+
 
   return (
     <Box sx={{ padding: "20px" }}>
@@ -122,14 +136,14 @@ const ProcessTable = () => {
           color="primary"
           onClick={handleCreateLot}
           sx={{ marginRight: "10px" }}
-           // Disable "Create Lot" after it's clicked
+          // Disable "Create Lot" after it's clicked
         >
           Create Lot
         </Button>
         <Button
           variant="contained"
           color="primary"
-          disabled 
+          disabled
           sx={{ marginRight: "10px" }}
         >
           Add Row
@@ -259,7 +273,8 @@ const ProcessTable = () => {
                     </Button>
                   </StyledTableCell>
                 </TableRow>
-                {item.kambiNotes.map((note, noteIndex) => (
+
+                {/* {item.kambiNotes.map((note, noteIndex) => (
                   <TableRow key={noteIndex}>
                     <StyledTableCell colSpan={2} />
                     {processes.map((process) => (
@@ -267,7 +282,7 @@ const ProcessTable = () => {
                         {process === "Kambi" ? (
                           <React.Fragment>
                             <StyledTableCell colSpan={3} />
-                            <StyledTableCell>
+                            <StyledTableCell >
                               <StyledInput
                                 value={note.name}
                                 onChange={(e) => {
@@ -279,7 +294,7 @@ const ProcessTable = () => {
                                 }}
                               />
                             </StyledTableCell>
-                            <StyledTableCell>
+                            <StyledTableCell >
                               <StyledInput
                                 value={note.weight}
                                 onChange={(e) => {
@@ -295,6 +310,52 @@ const ProcessTable = () => {
                         ) : (
                           <StyledTableCell colSpan={3} />
                         )}
+                      </React.Fragment>
+                    ))}
+                    <StyledTableCell />
+                  </TableRow>
+                ))} */}
+                {item.kambiNotes.map((note, noteIndex) => (
+                  <TableRow key={noteIndex}>
+                    <StyledTableCell colSpan={2} />
+                    {processes.map((process) => (
+                      <React.Fragment key={process}>
+                        <StyledTableCell>
+                          <StyledInput
+                            value={note.data[process]?.beforeWeight || ""}
+                            onChange={(e) => {
+                              const updatedItems = [...items];
+                              updatedItems[rowIndex].kambiNotes[noteIndex].data[
+                                process
+                              ].beforeWeight = e.target.value;
+                              setItems(updatedItems);
+                            }}
+                          />
+                        </StyledTableCell>
+                        <StyledTableCell>
+                          <StyledInput
+                            value={note.data[process]?.afterWeight || ""}
+                            onChange={(e) => {
+                              const updatedItems = [...items];
+                              updatedItems[rowIndex].kambiNotes[noteIndex].data[
+                                process
+                              ].afterWeight = e.target.value;
+                              setItems(updatedItems);
+                            }}
+                          />
+                        </StyledTableCell>
+                   
+                        <StyledTableCell>
+                          <b>
+                            {note.data[process]?.beforeWeight &&
+                            note.data[process]?.afterWeight
+                              ? (
+                                  parseFloat(note.data[process].beforeWeight) -
+                                  parseFloat(note.data[process].afterWeight)
+                                ).toFixed(2)
+                              : "-"}
+                          </b>
+                        </StyledTableCell>
                       </React.Fragment>
                     ))}
                     <StyledTableCell />
@@ -357,8 +418,16 @@ const ProcessTable = () => {
         </Box>
       </Modal>
     </Box>
-
   );
 };
 
 export default ProcessTable;
+
+
+
+
+
+
+
+
+
