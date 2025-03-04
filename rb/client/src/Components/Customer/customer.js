@@ -118,29 +118,33 @@ function Customer() {
     setOpen(true);
   };
 
-  const handleDelete = async (customer_id) => {
-    try {
-     await axios.delete(
-       `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customer_info/${customer_id}`
-     );
-      fetchCustomers();
-      toast.success("Customer deleted successfully!", { autoClose: 2000 });
-    } catch (error) {
-      console.error(
-        "Error deleting customer:",
-        error.response?.data || error.message
-      );
-      toast.error("Failed to delete customer!", { autoClose: 2000 });
-    }
-  };
+// const handleView = (customer) => {
+//   // Encode the customer name to handle spaces and special characters
+//   const encodedCustomerName = encodeURIComponent(customer.customer_name);
+//   navigate(`/transaction/${encodedCustomerName}`, { state: { customer } });
+// };
 
-  // const handleView = (customer) => {
-  //   navigate(`/transaction/${customer.customer_name}`, { state: { customer } });
-  // };
-const handleView = (customer) => {
-  // Encode the customer name to handle spaces and special characters
-  const encodedCustomerName = encodeURIComponent(customer.customer_name);
-  navigate(`/transaction/${encodedCustomerName}`, { state: { customer } });
+
+
+const handleDelete = async (customer_id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this customer?"
+  );
+  if (!confirmDelete) return;
+
+  try {
+    await axios.delete(
+      `${REACT_APP_BACKEND_SERVER_URL}/api/customer/customer_info/${customer_id}`
+    );
+    fetchCustomers();
+    toast.success("Customer deleted successfully!", { autoClose: 2000 });
+  } catch (error) {
+    console.error(
+      "Error deleting customer:",
+      error.response?.data || error.message
+    );
+    toast.error("Failed to delete customer!", { autoClose: 2000 });
+  }
 };
 
   const filteredCustomers = customers.filter((cust) =>
@@ -304,12 +308,13 @@ const handleView = (customer) => {
                     >
                       <Delete />
                     </IconButton>
-                    <IconButton
-                      onClick={() => handleView(cust)}
+                    {/* <IconButton
+                      onClick={() => handleView(cust)} 
+                      
                       style={{ color: "#25274D" }}
                     >
                       <Visibility />
-                    </IconButton>
+                    </IconButton> */}
                   </TableCell>
                 </TableRow>
               ))}

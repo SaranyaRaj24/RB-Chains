@@ -32,7 +32,7 @@ function Nav() {
 
           <Box>
             <Button
-              onClick={() => navigate("/lot")}
+              onClick={() => navigate("/process")}
               sx={{ color: "black", fontSize: "1rem", fontWeight: "bold" }}
             >
               Lot

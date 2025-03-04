@@ -73,7 +73,7 @@ function Home() {
                   backgroundColor: "#B8860B",
                   "&:hover": { backgroundColor: "#8B6508" },
                 }}
-                onClick={() => navigate("/customer")}
+                onClick={() => navigate("/process")}
               >
                 Login
               </Button>

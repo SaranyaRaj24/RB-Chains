@@ -1,38 +1,49 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+
+import React, { useState } from "react";
+import DailyReport from "./dailyreport";
+import CustomerReport from "./custreport";
 
 function Report() {
-  const navigate = useNavigate();
+  const [selectedReport, setSelectedReport] = useState(null);
 
   return (
     <div style={{ padding: "20px" }}>
-      {/* Toggle Buttons */}
-      <div style={{ display: "flex", gap: "10px" }}>
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
         <button
-          onClick={() => navigate("/dailyreport")}
+          onClick={() => setSelectedReport("daily")}
+          disabled={selectedReport === "daily"}
           style={{
             padding: "10px",
-            backgroundColor: "blue",
+            backgroundColor: selectedReport === "daily" ? "darkblue" : "blue",
             color: "white",
             border: "none",
-            cursor: "pointer",
+            cursor: selectedReport === "daily" ? "not-allowed" : "pointer",
+            opacity: selectedReport === "daily" ? 0.5 : 1,
           }}
         >
           Daily Report
         </button>
 
         <button
-          onClick={() => navigate("/custreport")}
+          onClick={() => setSelectedReport("customer")}
+          disabled={selectedReport === "customer"}
           style={{
             padding: "10px",
-            backgroundColor: "blue",
+            backgroundColor:
+              selectedReport === "customer" ? "darkblue" : "blue",
             color: "white",
             border: "none",
-            cursor: "pointer",
+            cursor: selectedReport === "customer" ? "not-allowed" : "pointer",
+            opacity: selectedReport === "customer" ? 0.5 : 1,
           }}
         >
           Customer Report
         </button>
+      </div>
+
+      <div>
+        {selectedReport === "daily" && <DailyReport />}
+        {selectedReport === "customer" && <CustomerReport />}
       </div>
     </div>
   );

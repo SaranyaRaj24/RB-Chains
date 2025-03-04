@@ -26,50 +26,63 @@ function DailyReport() {
   ];
 
   return (
-    <div style={{ padding: 20 }}>
-    
+    <>
+     <Typography
+           variant="h5"
+           style={{
+             fontWeight: "bold",
+             color: "black",
+             marginBottom: 20,
+            textAlign:"center"
 
-      {/* Date Filters */}
-      <div style={{ display: "flex", gap: "10px", marginBottom: 20 }}>
-        <TextField
-          label="From Date"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-        />
-        <TextField
-          label="To Date"
-          type="date"
-          InputLabelProps={{ shrink: true }}
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-        />
-        <Button variant="contained">Filter</Button>
-      </div>
+           }}
+         >
+           Daily Report
+         </Typography>
+      <div style={{ padding: 20 }}>
+        <div style={{ display: "flex", gap: "10px", marginBottom: 20 }}>
+          <TextField
+            label="From Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+          />
+          <TextField
+            label="To Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+          />
+          <Button variant="contained">Filter</Button>
+        </div>
 
-      {/* Table */}
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              {tableHeaders.map((header, index) => (
-                <TableCell key={index} style={{ fontWeight: "bold" }}>
-                  {header}
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead style={{ backgroundColor: "aliceblue" }}>
+              <TableRow>
+                {tableHeaders.map((header, index) => (
+                  <TableCell
+                    key={index}
+                    style={{ fontWeight: "bold", color: "black" }}
+                  >
+                    {header}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={tableHeaders.length} align="center">
+                  No data available
                 </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={tableHeaders.length} align="center">
-                No data available
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </div>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </div>
+    </>
   );
 }
 
