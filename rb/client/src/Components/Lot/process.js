@@ -87,7 +87,8 @@ const ProcessTable = () => {
   //   updatedItems[index].kambiNotes.push({ name: "", weight: "" });
   //   setItems(updatedItems);
   // };
-const handleAddItemColumns = (index) => {
+
+  const handleAddItemColumns = (index) => {
   const updatedItems = [...items];
   updatedItems[index].kambiNotes.push({
     name: "",
