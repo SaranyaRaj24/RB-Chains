@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+
 import {
   Button,
   TextField,
@@ -18,7 +18,7 @@ import {
   Typography,
   IconButton,
 } from "@mui/material";
-import { Edit, Delete, Visibility } from "@mui/icons-material";
+import { Edit, Delete, } from "@mui/icons-material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
@@ -36,7 +36,7 @@ function Customer() {
   });
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); 
-  const navigate = useNavigate();
+
 
   const handleOpen = () => {
     setCustomer({ name: "", shop: "", phone: "", address: "" });
@@ -117,14 +117,6 @@ function Customer() {
     setEditIndex(index);
     setOpen(true);
   };
-
-// const handleView = (customer) => {
-//   // Encode the customer name to handle spaces and special characters
-//   const encodedCustomerName = encodeURIComponent(customer.customer_name);
-//   navigate(`/transaction/${encodedCustomerName}`, { state: { customer } });
-// };
-
-
 
 const handleDelete = async (customer_id) => {
   const confirmDelete = window.confirm(

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   TextField,
   MenuItem,
@@ -15,50 +16,73 @@ import {
   Paper,
   IconButton,
   Typography,
+  Box,
 } from "@mui/material";
 import { Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const CustReport = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCustomer, setSelectedCustomer] = useState("");
-  const [customers, setCustomers] = useState([
-    { id: 1, name: "Customer A" },
-    { id: 2, name: "Customer B" },
-    { id: 3, name: "Customer C" },
-  ]);
-  const [data, setData] = useState([
-    {
-      id: 1,
-      date: "2023-10-01",
-      billNo: "1001",
-      customerName: "Customer A",
-    },
-    {
-      id: 2,
-      date: "2023-10-02",
-      billNo: "1002",
-      customerName: "Customer B",
-    },
-    {
-      id: 3,
-      date: "2023-10-03",
-      billNo: "1003",
-      customerName: "Customer C",
-    },
-  ]);
-  const [filteredData, setFilteredData] = useState(data);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
 
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchCustomers = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_SERVER_URL}/api/customer/customerinfo`
+        );
+        console.log("Fetched Customers:", response.data);
+        setCustomers(Array.isArray(response.data) ? response.data : []);
+
+        // Generate random data for testing
+        const randomData = response.data.map((customer, index) => ({
+          id: index + 1,
+          date: generateRandomDate(),
+          billNo: generateRandomBillNo(),
+          customerName: customer.customer_name,
+        }));
+        setData(randomData);
+      } catch (error) {
+        toast.error("Error fetching customers!", {
+          containerId: "custom-toast",
+        });
+        console.error("Error:", error);
+      }
+    };
+
+    fetchCustomers();
+  }, []);
+
+  const generateRandomDate = () => {
+    const start = new Date(2023, 0, 1);
+    const end = new Date();
+    return new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    )
+      .toISOString()
+      .split("T")[0];
+  };
+
+  const generateRandomBillNo = () => {
+    return Math.floor(100000 + Math.random() * 900000);
+  };
+
+  useEffect(() => {
     let filtered = data;
 
-    if (selectedCustomer) {
+    if (fromDate && toDate) {
       filtered = filtered.filter(
-        (item) => item.customerName === selectedCustomer
+        (item) =>
+          new Date(item.date) >= new Date(fromDate) &&
+          new Date(item.date) <= new Date(toDate)
       );
     }
 
@@ -68,11 +92,16 @@ const CustReport = () => {
       );
     }
 
+    if (selectedCustomer) {
+      filtered = filtered.filter(
+        (item) => item.customerName === selectedCustomer.customer_name
+      );
+    }
+
     setFilteredData(filtered);
-  }, [selectedCustomer, searchTerm, data]);
+  }, [fromDate, toDate, searchTerm, selectedCustomer, data]);
 
   const handleViewBill = (billNo) => {
-    // navigate(`/billing/${billNo}`);
     navigate(`/billing`);
   };
 
@@ -118,16 +147,27 @@ const CustReport = () => {
         <FormControl style={{ minWidth: 200 }}>
           <InputLabel>Select Customer</InputLabel>
           <Select
-            value={selectedCustomer}
+            value={selectedCustomer || ""}
             onChange={(e) => setSelectedCustomer(e.target.value)}
+            displayEmpty
           >
+          
             {customers.map((customer) => (
-              <MenuItem key={customer.id} value={customer.name}>
-                {customer.name}
+              <MenuItem key={customer.id} value={customer}>
+                {customer.customer_name}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
+
+        {selectedCustomer && (
+          <Box sx={{ marginTop: 2, padding: 2, border: "1px solid black" }}>
+            <Typography variant="h6">Customer Name:</Typography>
+            <strong>
+              {selectedCustomer.customer_name}
+            </strong>
+          </Box>
+        )}
 
         <TableContainer component={Paper} style={{ marginTop: "20px" }}>
           <Table>
@@ -181,8 +221,3 @@ const CustReport = () => {
 };
 
 export default CustReport;
-
-
-
-
-
